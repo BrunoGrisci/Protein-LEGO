@@ -1,0 +1,25 @@
+#Bruno Iochins Grisci
+#JUNE/2017
+
+AMINO_ACIDS = {'A':'amino_acids/alanine.pdb', 
+               'R':'amino_acids/arginine.pdb', 
+               'N':'amino_acids/aparagine.pdb', 
+               'D':'amino_acids/aspartic_acid.pdb', 
+               'ASX':'B', 
+               'C':'amino_acids/cysteine.pdb', 
+               'E':'amino_acids/glutamic_acid.pdb', 
+               'Q':'amino_acids/glutamine.pdb', 
+               'GLX':'Z', 
+               'G':'amino_acids/glycine.pdb', 
+               'H':'amino_acids/histidine.pdb', 
+               'I':'amino_acids/isoleucine.pdb', 
+               'L':'amino_acids/leucine.pdb', 
+               'K':'amino_acids/lysine.pdb', 
+               'M':'amino_acids/methionine.pdb', 
+               'F':'amino_acids/phenalalanine.pdb', 
+               'P':'amino_acids/proline.pdb', 
+               'S':'amino_acids/serine.pdb', 
+               'T':'amino_acids/threonine.pdb', 
+               'W':'amino_acids/tryptophan.pdb', 
+               'Y':'amino_acids/tyrosine.pdb', 
+               'V':'amino_acids/valine.pdb'}
