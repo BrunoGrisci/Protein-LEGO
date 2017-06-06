@@ -55,21 +55,24 @@ for aa in amino_acids:
 print("###################################################")
 
 aai = 1
-OC_pos = amino_acids[0].get_pos_OC()
-amino_acids[0].remove_OH()
-amino_acids[0].set_amino_acid_index(aai)
+if len(amino_acids) > 1:
+    OC_pos = amino_acids[0].get_pos_OC()
+    amino_acids[0].remove_OH()
+    amino_acids[0].set_amino_acid_index(aai)
 
-for aa in amino_acids[1:-1]:
-    aa.remove_H()
-    aa.relocate_N(OC_pos)
-    OC_pos = aa.get_pos_OC()
-    aa.remove_OH()
-    aai += 1
-    aa.set_amino_acid_index(aai)
+if len(amino_acids) > 2:
+    for aa in amino_acids[1:-1]:
+        aa.remove_H()
+        aa.relocate_N(OC_pos)
+        OC_pos = aa.get_pos_OC()
+        aa.remove_OH()
+        aai += 1
+        aa.set_amino_acid_index(aai)
 
-amino_acids[-1].remove_H()
-amino_acids[-1].relocate_N(OC_pos)
-amino_acids[-1].set_amino_acid_index(aai+1)
+if len(amino_acids) > 1:
+    amino_acids[-1].remove_H()
+    amino_acids[-1].relocate_N(OC_pos)
+    amino_acids[-1].set_amino_acid_index(aai+1)
 
 for aa in amino_acids:    
     for atom in aa.get_atoms():
