@@ -7,6 +7,8 @@ import math
 from pdb_reader import PDB_reader
 
 def calc_angles(pos1, pos2, pos3, pos4):
+    #https://math.stackexchange.com/questions/47059/how-do-i-calculate-a-dihedral-angle-given-cartesian-coordinates
+
     pos1 = np.array(pos1)
     pos2 = np.array(pos2)
     pos3 = np.array(pos3)
@@ -16,10 +18,14 @@ def calc_angles(pos1, pos2, pos3, pos4):
     bond23 = pos3 - pos2
     bond34 = pos4 - pos3
     
+    normal1 = np.cross(bond12, bond23) / np.linalg.norm(np.cross(bond12, bond23))  
+    normal2 = np.cross(bond23, bond34) / np.linalg.norm(np.cross(bond23, bond34))
+    m1 = np.cross(normal1, bond23 / np.linalg.norm(bond23))
     
-    
-    cos_angle = np.inner(bond12, bond34) / (math.sqrt(np.inner(bond12, bond12)) * math.sqrt(np.inner(bond34, bond34)))
-    angle = np.degrees(np.arccos(cos_angle))
+    x = np.inner(normal1, normal2)
+    y = np.inner(m1, normal2)
+    angle = math.atan2(y, x)
+    angle = np.degrees(angle)
     return round(angle, 2)
 
 pdb_file = sys.argv[1]
@@ -54,7 +60,7 @@ for aa in xrange(len(ca)):
         psi = calc_angles(n_pos, ca_pos, c_pos, nex_n_pos)
     else:
         psi = 360.0
-    print(name + "    " + str(phi) + "    " + str(psi))
+    print(name + "   " + str(phi) + "    " + str(psi))
 
 '''
 for amino_acid in zip(ca, n, c):
