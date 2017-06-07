@@ -1,38 +1,19 @@
 #Bruno Iochins Grisci
-#MAY/2017
-#This code is a usage example of the PDB_reader class
+#JUNE/2017
 
+import sys
 from pdb_reader import PDB_reader
 
-alanine = PDB_reader("amino_acids/alanine.pdb")
-print(len(alanine.get_atoms()))
-for a in alanine.get_atoms():
-    print(a)
-   
-alanine.send_origin()
-print(len(alanine.get_atoms())) 
-for a in alanine.get_atoms():
-    print(a)
+pdb_file = sys.argv[1]
+pdb = PDB_reader(pdb_file)
 
-ala_pos = alanine.get_pos_OC()
-print(ala_pos)
+ca = pdb.get_ca_info()
+print(ca)
 
-alanine.remove_H()
-print(len(alanine.get_atoms())) 
-for a in alanine.get_atoms():
-    print(a)
-    
-alanine.remove_OH()
-print(len(alanine.get_atoms())) 
-for a in alanine.get_atoms():
-    print(a)
-    
-alanine.relocate_N(ala_pos)
-print(len(alanine.get_atoms())) 
-for a in alanine.get_atoms():
-    print(a)
-    
-alanine.set_amino_acid_index(5)
-print(len(alanine.get_atoms())) 
-for a in alanine.get_atoms():
-    print(a)
+n = pdb.get_N_info()
+print(n)
+
+c = pdb.get_C_info()
+print(c)
+
+print(len(ca), len(n), len(c))

@@ -46,8 +46,8 @@ amino_acids = []
 for aa in aa_sequence: 
     amino_acids.append(PDB_reader(AMINO_ACIDS[aa]))
 
-#for aa in amino_acids:
-#    aa.send_origin()
+for aa in amino_acids:
+    aa.send_origin()
 for aa in amino_acids:    
     for atom in aa.get_atoms():
         print(atom)    

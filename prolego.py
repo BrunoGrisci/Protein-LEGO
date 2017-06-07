@@ -2,7 +2,7 @@
 #JUNE/2017
 
 import sys
-from pdb_reader import PDB_reader
+from aa_reader import AA_reader
 
 def write_pdb(file_name, amino_acids):
     pdb = open(file_name, "w")
@@ -44,7 +44,7 @@ aa_sequence = sys.argv[1]
 amino_acids = []
 
 for aa in aa_sequence: 
-    amino_acids.append(PDB_reader(AMINO_ACIDS[aa]))
+    amino_acids.append(AA_reader(AMINO_ACIDS[aa]))
 
 for aa in amino_acids:
     aa.send_origin()
