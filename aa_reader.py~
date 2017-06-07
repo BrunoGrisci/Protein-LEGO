@@ -4,16 +4,16 @@
 
 import copy
 
-class PDB_reader:
+class AA_reader:
 
     ATOM_TAG = "ATOM"
     END_TAG = "TER"
     ALPHA_CARBON = "CA"
     NITROGEN = "N"
     BACKBONE_ATOMS = ("N", "CA", "C", "O")
-    H_ATOMS = ("1H", "H")
-    OH_ATOMS = ("OC", "HOC", "HC")
-    WATER_ATOMS = ("1H", "H", "OC", "HOC", "HC")
+    H_ATOMS = ("2H", "H")
+    OH_ATOMS = ("OC", "HOC", "HC", "HO")
+    WATER_ATOMS = ("2H", "H", "OC", "HOC", "HC", "HO")
     
     IATOMTAG = 0
     IATOMINDEX = 1

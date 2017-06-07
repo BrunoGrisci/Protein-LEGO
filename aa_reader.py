@@ -11,9 +11,9 @@ class AA_reader:
     ALPHA_CARBON = "CA"
     NITROGEN = "N"
     BACKBONE_ATOMS = ("N", "CA", "C", "O")
-    H_ATOMS = ("1H", "H")
+    H_ATOMS = ("2H", "H")
     OH_ATOMS = ("OC", "HOC", "HC")
-    WATER_ATOMS = ("1H", "H", "OC", "HOC", "HC")
+    WATER_ATOMS = ("2H", "H", "OC", "HOC", "HC")
     
     IATOMTAG = 0
     IATOMINDEX = 1
