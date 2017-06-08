@@ -50,9 +50,11 @@ for aa in aa_sequence:
 
 for aa in amino_acids:
     aa.send_origin()
-for aa in amino_acids:    
-    for atom in aa.get_atoms():
-        print(atom)    
+    #aa.rename_O()
+    
+#for aa in amino_acids:    
+#    for atom in aa.get_atoms():
+#        print(atom)    
 
 print("###################################################")
 
@@ -76,11 +78,12 @@ if len(amino_acids) > 1:
     amino_acids[-1].relocate_N(OC_pos)
     amino_acids[-1].set_amino_acid_index(aai+1)
 
+index = 1
 for aa in amino_acids:
-    
+    index = aa.set_atoms_index(index)
 
-for aa in amino_acids:    
-    for atom in aa.get_atoms():
-        print(atom)
+#for aa in amino_acids:    
+#    for atom in aa.get_atoms():
+#        print(atom)
 
 write_pdb(aa_sequence + ".pdb", amino_acids)

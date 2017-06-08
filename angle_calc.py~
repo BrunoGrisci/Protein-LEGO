@@ -4,6 +4,8 @@
 import sys
 import numpy as np
 import math
+import matplotlib.pyplot as plt
+
 from pdb_reader import PDB_reader
 
 def calc_angles(pos1, pos2, pos3, pos4):
@@ -40,6 +42,11 @@ print(len(ca), len(n), len(c))
 print("A_A   PHI     PSI")
 print("-----------------")
 
+phis = []
+psis = []
+
+angle_file = open(pdb_file.replace('.pdb', '_angles.txt'), 'w')
+
 for aa in xrange(len(ca)):
     name   = ca[aa][1]
     
@@ -61,19 +68,25 @@ for aa in xrange(len(ca)):
     else:
         psi = 360.0
     
-    print("{:3s}  {:7.2f}  {:7.2f}".format(name, phi, psi))
-    #print(name + "   " + str(phi) + "    " + str(psi))
+    phis.append(phi)
+    psis.append(psi)
+    line = "{:3s}  {:7.2f}  {:7.2f}".format(name, phi, psi)
+    print(line)
+    angle_file.write(line + '\n')
+    
+angle_file.close()
 
-'''
-for amino_acid in zip(ca, n, c):
-    name = amino_acid[0][1]
-    ca_pos = amino_acid[0][2]
-    n_pos  = amino_acid[1][2]
-    c_pos  = amino_acid[2][2]
-    
-    phi = calc_angles(n_pos, ca_pos, c_pos)
-    
-    print(name + "    " + str(phi) + "    " + str(psi))'''
+plt.plot(phis, psis, 'ro')
+plt.axis([-180, 180, -180, 180])
+plt.grid(True)
+plt.title('Ramachandran Map ' + pdb_file)
+plt.xlabel('PHI')
+plt.ylabel('PSI')
+#plt.show()
+#plt.savefig(pdb_file.replace('.pdb', '.png'), bbox_inches='tight')
+fig = plt.gcf()
+fig.set_size(10, 10)
+fig.savefig(pdb_file.replace('.pdb', '.png'), dpi=100, bbox_inches='tight')
     
      
      

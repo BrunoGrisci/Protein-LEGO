@@ -50,9 +50,11 @@ for aa in aa_sequence:
 
 for aa in amino_acids:
     aa.send_origin()
-for aa in amino_acids:    
-    for atom in aa.get_atoms():
-        print(atom)    
+    #aa.rename_O()
+    
+#for aa in amino_acids:    
+#    for atom in aa.get_atoms():
+#        print(atom)    
 
 print("###################################################")
 

@@ -70,16 +70,32 @@ class AA_reader:
             atom[self.IX] += tx
             atom[self.IY] += ty
             atom[self.IZ] += tz
+    
+    '''def rename_O(self):
+        change = False
+        O_i = None
+        OC_i = None
+        for atom in self.atoms:
+            if atom[self.IATOM] == "O":
+                O_i = self.atoms.index(atom)
+            elif atom[self.IATOM] == "OC":
+                OC_i = self.atoms.index(atom)
+            elif atom[self.IATOM] == "HO":
+                change = True
+        if change:
+            self.atoms[O_i][self.IATOM] = "OC"
+            self.atoms[OC_i][self.IATOM] = "O"   
+            print(self.file_name)''' 
             
     def get_pos_OC(self):
-        ohi = 0
+        ohi = None
         for atom in self.atoms:
             if atom[self.IATOM] == "OC":
                 ohi = self.atoms.index(atom)
         return self.atoms[ohi][self.IX], self.atoms[ohi][self.IY], self.atoms[ohi][self.IZ]  
             
     def remove_H(self):
-        hi = 0
+        hi = None
         for atom in self.atoms:
             if atom[self.IATOM] in self.H_ATOMS:
                 hi = self.atoms.index(atom)
@@ -94,7 +110,7 @@ class AA_reader:
             self.atoms.pop(i) 
             
     def relocate_N(self, (x, y, z)):
-        ni = 0
+        ni = None
         for atom in self.atoms:
             if atom[self.IATOM] == self.NITROGEN:
                 ni = self.atoms.index(atom)
