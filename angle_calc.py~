@@ -85,7 +85,7 @@ plt.ylabel('PSI')
 #plt.show()
 #plt.savefig(pdb_file.replace('.pdb', '.png'), bbox_inches='tight')
 fig = plt.gcf()
-fig.set_size(10, 10)
+fig.set_size_inches(10, 10)
 fig.savefig(pdb_file.replace('.pdb', '.png'), dpi=100, bbox_inches='tight')
     
      
