@@ -26,7 +26,7 @@ def calc_angles(pos1, pos2, pos3, pos4):
     y = np.inner(m1, normal2)
     angle = math.atan2(y, x)
     angle = np.degrees(angle)
-    return round(angle, 2)
+    return round(-angle, 2)
 
 pdb_file = sys.argv[1]
 pdb = PDB_reader(pdb_file)
@@ -37,8 +37,8 @@ c = pdb.get_C_info()
 
 print(len(ca), len(n), len(c))
 
-print("A_A   PHI    PSI")
-print("----------------")
+print("A_A   PHI     PSI")
+print("-----------------")
 
 for aa in xrange(len(ca)):
     name   = ca[aa][1]
@@ -60,7 +60,9 @@ for aa in xrange(len(ca)):
         psi = calc_angles(n_pos, ca_pos, c_pos, nex_n_pos)
     else:
         psi = 360.0
-    print(name + "   " + str(phi) + "    " + str(psi))
+    
+    print("{:3s}  {:7.2f}  {:7.2f}".format(name, phi, psi))
+    #print(name + "   " + str(phi) + "    " + str(psi))
 
 '''
 for amino_acid in zip(ca, n, c):

@@ -109,6 +109,13 @@ class AA_reader:
     def set_amino_acid_index(self, index):
         for atom in self.atoms:
             atom[self.IAMINOACIDINDEX] = index
+            
+    def set_atoms_index(self, index):
+        i = index
+        for atom in self.atoms:
+            atom[self.IATOMINDEX] = index
+            i += 1
+        return i
                 
                 
        

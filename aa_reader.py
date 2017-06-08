@@ -12,8 +12,8 @@ class AA_reader:
     NITROGEN = "N"
     BACKBONE_ATOMS = ("N", "CA", "C", "O")
     H_ATOMS = ("2H", "H")
-    OH_ATOMS = ("OC", "HOC", "HC")
-    WATER_ATOMS = ("2H", "H", "OC", "HOC", "HC")
+    OH_ATOMS = ("OC", "HOC", "HC", "HO")
+    WATER_ATOMS = ("2H", "H", "OC", "HOC", "HC", "HO")
     
     IATOMTAG = 0
     IATOMINDEX = 1
@@ -109,6 +109,13 @@ class AA_reader:
     def set_amino_acid_index(self, index):
         for atom in self.atoms:
             atom[self.IAMINOACIDINDEX] = index
+            
+    def set_atoms_index(self, index):
+        i = index
+        for atom in self.atoms:
+            atom[self.IATOMINDEX] = i
+            i += 1
+        return i
                 
                 
        

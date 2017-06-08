@@ -76,6 +76,10 @@ if len(amino_acids) > 1:
     amino_acids[-1].relocate_N(OC_pos)
     amino_acids[-1].set_amino_acid_index(aai+1)
 
+index = 1
+for aa in amino_acids:
+    index = aa.set_atoms_index(index)
+
 for aa in amino_acids:    
     for atom in aa.get_atoms():
         print(atom)
