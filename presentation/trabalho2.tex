@@ -83,6 +83,8 @@
 \usepackage[T1]{fontenc}
 \usepackage{amsmath}
 \usepackage{animate}
+\usepackage{amsmath}
+\DeclareMathOperator{\atantwo}{atan2}
 
 %----------------------------------------------------------------------------------------
 %	TITLE PAGE
@@ -158,13 +160,26 @@ Sequência: VSCEDCPEHCSTQKAQAKCDNDKCVCEPI
 \frametitle{Cálculo dos ângulos}
 Átomos:
 \begin{itemize}
-\item PHI: C-1 - N - Ca - C
-\item PSI: N - Ca - C - N+1
+  \item $\phi$ (phi): $C_{n-1} - N_{n} - C_{\alpha n} - C_{n}$
+  \item $\psi$ (psi): $N_{n} - C_{\alpha n} - C_{n} - N_{n+1}$
 \end{itemize}
 \end{frame}
 
 \begin{frame}
 \frametitle{Cálculo de ângulo diedro}
+
+\begin{itemize}
+ \item $P_{1}, P_{2}, P_{3}, P_{4}$
+ \item $\vec{b_{1}} = P_{2} - P_{1}, \vec{b_{2}} = P_{3} - P_{2}, \vec{b_{3}} = P_{4} - P_{3}$
+ \item $\vec{n_{1}} = \frac{\vec{b_{1}} \times \vec{b_{2}}}{\parallel \vec{b_{1}} \times \vec{b_{2}} \parallel}$
+ \item $\vec{n_{2}} = \frac{\vec{b_{2}} \times \vec{b_{3}}}{\parallel \vec{b_{2}} \times \vec{b_{3}} \parallel}$
+ \item $\vec{m_{1}} = \vec{n_{1}} \times \frac{\vec{b_{2}}}{\parallel \vec{b_{2}} \parallel}$
+ \item $x = \vec{n_{1}} \cdot \vec{n_{2}}$
+ \item $y = \vec{m_{1}} \cdot \vec{n_{2}}$
+ \item $\alpha = - \atantwo(y, x)$
+\end{itemize}
+
+%n1=\frac{b1\times b2}{\parallel b1\times b2 \parallel}, n2=\frac{b2\times b3}{\parallel b2\times b3 \parallel} \rightarrow m1 = n1\times \frac{b2}{\parallel b2 \parallel}
 
 \end{frame}
 
