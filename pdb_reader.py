@@ -103,22 +103,93 @@ class PDB_reader:
         aux_atoms = []
         aux_pos = []
         aux_aa = []
+        aux_aan = []
         for a in xrange(len(ref_atoms)):  
-            #print(ref_atoms[a], ref_amino_acids[a])      
-            if (ref_atoms[a], ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
+            #print(ref_atoms[a], ref_amino_acids[a])  
+            if ref_atoms[a] == None:
+                pass   
+            elif (ref_atoms[a], ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                 i = zip(self.atoms, self.amino_acids_number).index((ref_atoms[a], ref_amino_acids[a]))
                 aux_atoms.append(self.atoms.pop(i))
                 aux_pos.append(self.atoms_pos.pop(i))
                 aux_aa.append(self.amino_acids_number.pop(i))
+                aux_aan.append(self.amino_acids.pop(i))
+            elif (ref_atoms[a][1:]+ref_atoms[a][0], ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
+                i = zip(self.atoms, self.amino_acids_number).index((ref_atoms[a][1:]+ref_atoms[a][0], ref_amino_acids[a]))
+                aux_atoms.append(self.atoms.pop(i))
+                aux_pos.append(self.atoms_pos.pop(i))
+                aux_aa.append(self.amino_acids_number.pop(i))
+                aux_aan.append(self.amino_acids.pop(i))
+            elif (ref_atoms[a][-1]+ref_atoms[a][0:-1], ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
+                i = zip(self.atoms, self.amino_acids_number).index((ref_atoms[a][-1]+ref_atoms[a][0:-1], ref_amino_acids[a]))
+                aux_atoms.append(self.atoms.pop(i))
+                aux_pos.append(self.atoms_pos.pop(i))
+                aux_aa.append(self.amino_acids_number.pop(i))
+                aux_aan.append(self.amino_acids.pop(i))
+            elif (ref_atoms[a] == "OXT" and ("OC", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
+                    i = zip(self.atoms, self.amino_acids_number).index(("OC", ref_amino_acids[a]))
+                    aux_atoms.append(self.atoms.pop(i))
+                    aux_pos.append(self.atoms_pos.pop(i))
+                    aux_aa.append(self.amino_acids_number.pop(i))
+                    aux_aan.append(self.amino_acids.pop(i))
+            elif (ref_atoms[a] == "OC" and ("OXT", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
+                    i = zip(self.atoms, self.amino_acids_number).index(("OXT", ref_amino_acids[a]))
+                    aux_atoms.append(self.atoms.pop(i))
+                    aux_pos.append(self.atoms_pos.pop(i))
+                    aux_aa.append(self.amino_acids_number.pop(i))
+                    aux_aan.append(self.amino_acids.pop(i))
+            elif (ref_atoms[a] == "H" and ("1H", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
+                    i = zip(self.atoms, self.amino_acids_number).index(("1H", ref_amino_acids[a]))
+                    aux_atoms.append(self.atoms.pop(i))
+                    aux_pos.append(self.atoms_pos.pop(i))
+                    aux_aa.append(self.amino_acids_number.pop(i))
+                    aux_aan.append(self.amino_acids.pop(i))
+            elif (ref_atoms[a] == "1H" and ("H", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
+                    i = zip(self.atoms, self.amino_acids_number).index(("H", ref_amino_acids[a]))
+                    aux_atoms.append(self.atoms.pop(i))
+                    aux_pos.append(self.atoms_pos.pop(i))
+                    aux_aa.append(self.amino_acids_number.pop(i))
+                    aux_aan.append(self.amino_acids.pop(i))
+            elif (len(ref_atoms[a]) == 3 and "H" in ref_atoms[a] and "3" in ref_atoms[a]):
+                ra = ref_atoms[a].replace("3", "1")
+                ra = ra[-1]+ra[0:-1]
+                print("Changing: ")
+                print(ref_atoms[a], ra)
+                if (ra, ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
+                    i = zip(self.atoms, self.amino_acids_number).index((ra, ref_amino_acids[a]))
+                    aux_atoms.append(self.atoms.pop(i))
+                    aux_pos.append(self.atoms_pos.pop(i))
+                    aux_aa.append(self.amino_acids_number.pop(i))
+                    aux_aan.append(self.amino_acids.pop(i))
+            elif (len(ref_atoms[a]) == 3 and "H" in ref_atoms[a] and "1" in ref_atoms[a]):
+                ra = ref_atoms[a].replace("1", "3")
+                ra = ra[1:]+ra[0]
+                print("Changing: ")
+                print(ref_atoms[a], ra)
+                if (ra, ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
+                    i = zip(self.atoms, self.amino_acids_number).index((ra, ref_amino_acids[a]))
+                    aux_atoms.append(self.atoms.pop(i))
+                    aux_pos.append(self.atoms_pos.pop(i))
+                    aux_aa.append(self.amino_acids_number.pop(i))
+                    aux_aan.append(self.amino_acids.pop(i))
             else:
                 aux_atoms.append(None)
                 aux_pos.append(None)
                 aux_aa.append(None)
-                #print(ref_atoms[a])
+                aux_aan.append(None)
+                print("Not found: ")
+                print(ref_atoms[a], ref_amino_acids[a])
         #print(zip(self.atoms, self.amino_acids_number))
         self.atoms = copy.deepcopy(aux_atoms)
         self.atoms_pos = copy.deepcopy(aux_pos)
         self.amino_acids_number = copy.deepcopy(aux_aa)
+        self.amino_acids = copy.deepcopy(aux_aan)
+        
+    def remove_nones(self):
+        self.atoms = [x for x in self.atoms if x is not None] 
+        self.atoms_pos = [x for x in self.atoms_pos if x is not None] 
+        self.amino_acids_number = [x for x in self.amino_acids_number if x is not None]  
+        self.amino_acids = [x for x in self.amino_acids if x is not None]   
         
     def is_number(self, s):
         try:
