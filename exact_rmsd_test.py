@@ -1,3 +1,7 @@
+#Bruno Iochins Grisci
+#JUNE/2017
+#Usage: python exact_rmsd_test.py reference_file mobile_file
+
 import math
 import numpy as np
 import copy

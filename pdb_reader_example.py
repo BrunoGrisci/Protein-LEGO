@@ -7,6 +7,9 @@ from pdb_reader import PDB_reader
 pdb_file = sys.argv[1]
 pdb = PDB_reader(pdb_file)
 
+naa = pdb.get_number_amino_acids()
+print(naa)
+
 ca = pdb.get_ca_info()
 print(ca)
 
@@ -17,3 +20,6 @@ c = pdb.get_C_info()
 print(c)
 
 print(len(ca), len(n), len(c))
+
+for angles in pdb.get_angles():
+    print(angles)
