@@ -14,6 +14,7 @@ class PDB_reader:
     NITROGEN = "N"
     CARBON = "C"
     BACKBONE_ATOMS = ("N", "CA", "C", "O")
+    OC_ATOMS = ("C", "O", "OC", "HOC", "HC", "HO")
     
     def __init__(self, file_name):
         self.file_name = file_name
@@ -260,39 +261,41 @@ class PDB_reader:
         
     def rotate_to(self, angles):
         n_aa = self.get_number_amino_acids()
-        current_angles = self.get_angles()
-        rot_angles = np.array(current_angles) - np.array(angles)
         
-        for i in xrange(n_aa):
-            phi = rot_angles[i]
-            psi = rot_angles[i+1]
-
-            ca_pos = None
-            c_pos = None
-            nex_n_pos = None
-            for atom in zip(self.atoms, self.atoms_pos, self.amino_acids_number):
-                if atom[2] == i + min(self.amino_acids_number):
-                    if atom[0] == "CA":
-                        ca_pos = atom[1]
-                    elif atom[0] == "C":
-                        c_pos = atom[1] 
-                elif atom[2] == i + 1 + min(self.amino_acids_number):
-                    if atom[0] == "N":
-                        nex_n_pos = atom[1]
-            
-            rot_phi = None
-            rot_psi = None   
-            if i > 0:
-                rot_phi = self.rotaxis2m(phi, ca_pos)
-            if i + min(self.amino_acids_number) < max(self.amino_acids_number):
-                rot_psi = self.rotaxis2m(psi, c_pos)
-            
+        for i in xrange(n_aa):     
+            #ROTATE PHI   
+            ca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i + min(self.amino_acids_number)))
+            current_angles = self.get_angles()
+            dphi = math.atan2(math.sin(angles[2*i] - current_angles[2*i]), math.cos(angles[2*i] - current_angles[2*i]))
+            print(math.degrees(dphi))
+            ca_pos = self.atoms_pos[ca_i]
+            rot_phi = self.rotaxis2m(dphi, ca_pos)                 
             ia = 0
             for atom in zip(self.atoms, self.atoms_pos, self.amino_acids_number):
-                if atom[2] > i + min(self.amino_acids_number) and atom[2] < max(self.amino_acids_number) and i + min(self.amino_acids_number) < max(self.amino_acids_number):
+                if (atom[2] > i + min(self.amino_acids_number) or (atom[2] == i + min(self.amino_acids_number) and (atom[0] in self.OC_ATOMS))) and i + min(self.amino_acids_number) > min(self.amino_acids_number): 
+                    #print("PHI", i+min(self.amino_acids_number), atom[0], atom[2])                 
+                    self.atoms_pos[ia] = np.matrix.tolist((rot_phi * np.matrix(atom[1]).transpose()).transpose())[0]  
+                    #self.atoms_pos[ia] = np.matrix.tolist(np.matrix(atom[1]) * rot_phi)[0]  
+                #else:
+                    #print("#PHI#", i+min(self.amino_acids_number), atom[0], atom[2])                           
+                ia += 1         
+            #ROTATE PSI    
+            c_i  = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))  
+            current_angles = self.get_angles()
+            dpsi = math.atan2(math.sin(angles[2*i+1] - current_angles[2*i+1]), math.cos(angles[2*i+1] - current_angles[2*i+1]))
+            print(math.degrees(dpsi))                 
+            c_pos = self.atoms_pos[c_i]
+            rot_psi = self.rotaxis2m(dpsi, c_pos)   
+            ia = 0
+            for atom in zip(self.atoms, self.atoms_pos, self.amino_acids_number):
+                if atom[2] > i + min(self.amino_acids_number) and i + min(self.amino_acids_number) < max(self.amino_acids_number):       
+                    #print("PSI", i+min(self.amino_acids_number), atom[0], atom[2])
                     self.atoms_pos[ia] = np.matrix.tolist((rot_psi * np.matrix(atom[1]).transpose()).transpose())[0]
-                ia += 1 
-                
+                    #self.atoms_pos[ia] = np.matrix.tolist(np.matrix(atom[1]) * rot_psi)[0] 
+                #else:
+                    #print("#PSI#", i+min(self.amino_acids_number), atom[0], atom[2])              
+                ia += 1  
+      
     def normalize(self, v):
         norm = np.linalg.norm(v)
         if norm == 0: 
