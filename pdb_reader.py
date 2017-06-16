@@ -268,12 +268,15 @@ class PDB_reader:
             current_angles = self.get_angles()
             dphi = math.atan2(math.sin(angles[2*i] - current_angles[2*i]), math.cos(angles[2*i] - current_angles[2*i]))
             ca_pos = self.atoms_pos[ca_i]
-            rot_phi = self.rotaxis2m(dphi, ca_pos)                 
+            #rot_phi = self.rotaxis2m(dphi, ca_pos)                 
             ia = 0
             for atom in zip(self.atoms, self.atoms_pos, self.amino_acids_number):
                 if (atom[2] > i + min(self.amino_acids_number) or (atom[2] == i + min(self.amino_acids_number) and (atom[0] in self.OC_ATOMS))) and i + min(self.amino_acids_number) > min(self.amino_acids_number): 
-                    #print("PHI", i+min(self.amino_acids_number), atom[0], atom[2])                 
-                    self.atoms_pos[ia] = np.matrix.tolist((rot_phi * np.matrix(atom[1]).transpose()).transpose())[0]  
+                    #print("PHI", i+min(self.amino_acids_number), atom[0], atom[2])  
+                    origin_pos = list(np.array(atom[1]) - np.array(ca_pos))              
+                    rot_phi = self.rotaxis2m(dphi, origin_pos)   
+                    rot_pos = np.matrix.tolist((rot_phi * np.matrix(origin_pos).transpose()).transpose())[0]
+                    self.atoms_pos[ia] = list(np.array(rot_pos) + np.array(ca_pos))
                     #self.atoms_pos[ia] = np.matrix.tolist(np.matrix(atom[1]) * rot_phi)[0]  
                 #else:
                     #print("#PHI#", i+min(self.amino_acids_number), atom[0], atom[2])                           
@@ -283,12 +286,15 @@ class PDB_reader:
             current_angles = self.get_angles()
             dpsi = math.atan2(math.sin(angles[2*i+1] - current_angles[2*i+1]), math.cos(angles[2*i+1] - current_angles[2*i+1]))                
             c_pos = self.atoms_pos[c_i]
-            rot_psi = self.rotaxis2m(dpsi, c_pos)   
+            #rot_psi = self.rotaxis2m(dpsi, c_pos)   
             ia = 0
             for atom in zip(self.atoms, self.atoms_pos, self.amino_acids_number):
                 if atom[2] > i + min(self.amino_acids_number) and i + min(self.amino_acids_number) < max(self.amino_acids_number):       
-                    #print("PSI", i+min(self.amino_acids_number), atom[0], atom[2])
-                    self.atoms_pos[ia] = np.matrix.tolist((rot_psi * np.matrix(atom[1]).transpose()).transpose())[0]
+                    #print("PSI", i+min(self.amino_acids_number), atom[0], atom[2])      
+                    origin_pos = list(np.array(atom[1]) - np.array(c_pos))                
+                    rot_psi = self.rotaxis2m(dpsi, origin_pos)      
+                    rot_pos = np.matrix.tolist((rot_psi * np.matrix(origin_pos).transpose()).transpose())[0]
+                    self.atoms_pos[ia] = list(np.array(rot_pos) + np.array(c_pos))
                     #self.atoms_pos[ia] = np.matrix.tolist(np.matrix(atom[1]) * rot_psi)[0] 
                 #else:
                     #print("#PSI#", i+min(self.amino_acids_number), atom[0], atom[2])              
@@ -301,13 +307,13 @@ class PDB_reader:
         return v/norm
         
     def rotaxis2m(self, theta, pos): 
-    	s = np.sin(theta) 
-    	c = np.cos(theta)
+    	s = math.sin(theta) 
+    	c = math.cos(theta)
     	t = 1.0 - c
-    	pos = self.normalize(np.array(pos))
-        x = pos[0]
-        y = pos[1]
-        z = pos[2]
+    	npos = self.normalize(np.array(pos))
+        x = npos[0]
+        y = npos[1]
+        z = npos[2]
         rotM = np.matrix([[t*x*x+c, t*x*y-s*z, t*x*z+s*y], [t*x*y+s*z, t*y*y+c, t*y*z-s*x], [t*x*z-s*y, t*y*z+s*x, t*z*z+c]])
         return rotM    
         
