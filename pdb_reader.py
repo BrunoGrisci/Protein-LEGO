@@ -15,6 +15,7 @@ class PDB_reader:
     CARBON = "C"
     BACKBONE_ATOMS = ("N", "CA", "C", "O")
     OC_ATOMS = ("C", "O", "OC", "HOC", "HC", "HO")
+    NH_ATOMS = ("N", "1H", "H1", "2H", "H2")
     
     def __init__(self, file_name):
         self.file_name = file_name
@@ -258,64 +259,53 @@ class PDB_reader:
             angles.append(phi)
             angles.append(psi)
         return angles
+
+    def rotate(self, angle):
+        rot = self.rotaxis2m(angle, self.atoms_pos[20])
+        self.atoms_pos = np.matrix.tolist(np.matrix(self.atoms_pos) * rot.transpose())
         
     def rotate_to(self, angles):
         n_aa = self.get_number_amino_acids()
-        
         for i in xrange(n_aa):     
-            #ROTATE PHI   
+            #ROTATE PHI
+            n_i = zip(self.atoms, self.amino_acids_number).index(("N", i + min(self.amino_acids_number)))   
             ca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i + min(self.amino_acids_number)))
             current_angles = self.get_angles()
             dphi = math.atan2(math.sin(angles[2*i] - current_angles[2*i]), math.cos(angles[2*i] - current_angles[2*i]))
-            ca_pos = self.atoms_pos[ca_i]
-            #rot_phi = self.rotaxis2m(dphi, ca_pos)                 
+            n_pos = self.atoms_pos[n_i]
+            ca_pos = self.atoms_pos[ca_i]                
             ia = 0
-            for atom in zip(self.atoms, self.atoms_pos, self.amino_acids_number):
-                if (atom[2] > i + min(self.amino_acids_number) or (atom[2] == i + min(self.amino_acids_number) and (atom[0] in self.OC_ATOMS))) and i + min(self.amino_acids_number) > min(self.amino_acids_number): 
-                    #print("PHI", i+min(self.amino_acids_number), atom[0], atom[2])  
-                    origin_pos = list(np.array(atom[1]) - np.array(ca_pos))              
-                    rot_phi = self.rotaxis2m(dphi, origin_pos)   
-                    rot_pos = np.matrix.tolist((rot_phi * np.matrix(origin_pos).transpose()).transpose())[0]
-                    self.atoms_pos[ia] = list(np.array(rot_pos) + np.array(ca_pos))
-                    #self.atoms_pos[ia] = np.matrix.tolist(np.matrix(atom[1]) * rot_phi)[0]  
-                #else:
-                    #print("#PHI#", i+min(self.amino_acids_number), atom[0], atom[2])                           
-                ia += 1         
+            for atom in zip(self.atoms, self.amino_acids_number):
+                if i > 0 and (atom[1] > i + min(self.amino_acids_number) or (atom[1] == i + min(self.amino_acids_number) and (atom[0] in self.OC_ATOMS))): 
+                    self.atoms_pos[ia] = self.rotate_atom_around_bond(dphi, self.atoms_pos[ia], n_pos, ca_pos)   
+                ia += 1        
             #ROTATE PSI    
             c_i  = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))  
+            ca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i + min(self.amino_acids_number)))
             current_angles = self.get_angles()
-            dpsi = math.atan2(math.sin(angles[2*i+1] - current_angles[2*i+1]), math.cos(angles[2*i+1] - current_angles[2*i+1]))                
-            c_pos = self.atoms_pos[c_i]
-            #rot_psi = self.rotaxis2m(dpsi, c_pos)   
+            dpsi = math.atan2(math.sin(angles[2*i+1] - current_angles[2*i+1]), math.cos(angles[2*i+1] - current_angles[2*i+1]))              
+            c_pos = self.atoms_pos[c_i] 
+            ca_pos = self.atoms_pos[ca_i]
             ia = 0
-            for atom in zip(self.atoms, self.atoms_pos, self.amino_acids_number):
-                if atom[2] > i + min(self.amino_acids_number) and i + min(self.amino_acids_number) < max(self.amino_acids_number):       
-                    #print("PSI", i+min(self.amino_acids_number), atom[0], atom[2])      
-                    origin_pos = list(np.array(atom[1]) - np.array(c_pos))                
-                    rot_psi = self.rotaxis2m(dpsi, origin_pos)      
-                    rot_pos = np.matrix.tolist((rot_psi * np.matrix(origin_pos).transpose()).transpose())[0]
-                    self.atoms_pos[ia] = list(np.array(rot_pos) + np.array(c_pos))
-                    #self.atoms_pos[ia] = np.matrix.tolist(np.matrix(atom[1]) * rot_psi)[0] 
-                #else:
-                    #print("#PSI#", i+min(self.amino_acids_number), atom[0], atom[2])              
+            for atom in zip(self.atoms, self.amino_acids_number):
+                if atom[1] > i + min(self.amino_acids_number) and i + min(self.amino_acids_number) < max(self.amino_acids_number): 
+                    self.atoms_pos[ia] = self.rotate_atom_around_bond(dpsi, self.atoms_pos[ia], ca_pos, c_pos)          
                 ia += 1  
-      
+            #self.write_pdb("t" + str(i) + ".pdb")
+            
     def normalize(self, v):
         norm = np.linalg.norm(v)
         if norm == 0: 
            return v
-        return v/norm
-        
-    def rotaxis2m(self, theta, pos): 
-    	s = math.sin(theta) 
-    	c = math.cos(theta)
-    	t = 1.0 - c
-    	npos = self.normalize(np.array(pos))
-        x = npos[0]
-        y = npos[1]
-        z = npos[2]
-        rotM = np.matrix([[t*x*x+c, t*x*y-s*z, t*x*z+s*y], [t*x*y+s*z, t*y*y+c, t*y*z-s*x], [t*x*z-s*y, t*y*z+s*x, t*z*z+c]])
-        return rotM    
+        return v/norm  
+    
+    def rotate_atom_around_bond(self, theta, atom_pos, bond_start, bond_end):
+        #https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
+        v = np.array(atom_pos) - np.array(bond_start)
+        k = np.array(bond_end) - np.array(bond_start)
+        k = self.normalize(k)
+        rot_pos = v * np.cos(theta) + (np.cross(k, v)) * np.sin(theta) + k * (np.dot(k,v)) * (1.0 - np.cos(theta))
+        return list(rot_pos + np.array(bond_start))
         
     def is_number(self, s):
         try:
