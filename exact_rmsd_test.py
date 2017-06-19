@@ -23,7 +23,8 @@ mobile_file = sys.argv[2]
 pdb_ref = PDB_reader(reference_file)
 pdb_mob = PDB_reader(mobile_file)
 
-oa = pdb_mob.get_atoms()
+#pdb_mob.move_to(pdb_ref.get_all_pos()[0])
+#pdb_mob.write_pdb("testN.pdb")
 
 print(len(pdb_ref.get_atoms()), len(pdb_mob.get_atoms()))
 

@@ -108,6 +108,17 @@ class PDB_reader:
             if a[0] == self.CARBON:
                 c_info.append(a)
         return copy.deepcopy(c_info) 
+
+    def move_to_origin(self):
+        first_pos = np.matrix([self.atoms_pos[0]] * len(self.atoms_pos))
+        pos = np.matrix(self.atoms_pos)
+        self.atoms_pos = np.matrix.tolist(pos - first_pos)
+        
+    def move_to(self, target):
+        self.move_to_origin()
+        movement = np.matrix([target] * len(self.atoms_pos))
+        pos = np.matrix(self.atoms_pos)
+        self.atoms_pos = np.matrix.tolist(pos - movement)
         
     def match_atoms(self, ref_atoms, ref_amino_acids):
         aux_atoms = []

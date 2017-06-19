@@ -93,6 +93,20 @@ class AA_reader:
             if atom[self.IATOM] == "OC":
                 ohi = self.atoms.index(atom)
         return self.atoms[ohi][self.IX], self.atoms[ohi][self.IY], self.atoms[ohi][self.IZ]  
+ 
+    def get_pos_AC(self):
+        aci = None
+        for atom in self.atoms:
+            if atom[self.IATOM] == self.ALPHA_CARBON:
+                aci = self.atoms.index(atom)
+        return self.atoms[aci][self.IX], self.atoms[aci][self.IY], self.atoms[aci][self.IZ]  
+
+    def get_pos_C(self):
+        ci = None
+        for atom in self.atoms:
+            if atom[self.IATOM] == "C":
+                ci = self.atoms.index(atom)
+        return self.atoms[ci][self.IX], self.atoms[ci][self.IY], self.atoms[ci][self.IZ]  
             
     def remove_H(self):
         hi = None

@@ -2,6 +2,8 @@
 #JUNE/2017
 
 import sys
+import numpy as np
+
 from aa_reader import AA_reader
 
 def write_pdb(file_name, amino_acids):
@@ -61,13 +63,19 @@ print("###################################################")
 aai = 1
 if len(amino_acids) > 1:
     OC_pos = amino_acids[0].get_pos_OC()
+    C_pos = amino_acids[0].get_pos_C()
     amino_acids[0].remove_OH()
     amino_acids[0].set_amino_acid_index(aai)
 
 if len(amino_acids) > 2:
     for aa in amino_acids[1:-1]:
         aa.remove_H()
+        distance_vector = np.array(OC_pos) - np.array(C_pos)
+        distance = np.linalg.norm(distance_vector)
+        r = 1.32/distance       
+        #aa.relocate_N(list(np.array(C_pos) + r * distance_vector))
         aa.relocate_N(OC_pos)
+        C_pos = aa.get_pos_C()
         OC_pos = aa.get_pos_OC()
         aa.remove_OH()
         aai += 1
@@ -75,6 +83,7 @@ if len(amino_acids) > 2:
 
 if len(amino_acids) > 1:
     amino_acids[-1].remove_H()
+    #amino_acids[-1].relocate_N(list(np.array(C_pos) + r * distance_vector))
     amino_acids[-1].relocate_N(OC_pos)
     amino_acids[-1].set_amino_acid_index(aai+1)
 
@@ -82,8 +91,8 @@ index = 1
 for aa in amino_acids:
     index = aa.set_atoms_index(index)
 
-#for aa in amino_acids:    
-#    for atom in aa.get_atoms():
-#        print(atom)
+for aa in amino_acids:    
+    for atom in aa.get_atoms():
+        print(atom)
 
 write_pdb(aa_sequence + ".pdb", amino_acids)
