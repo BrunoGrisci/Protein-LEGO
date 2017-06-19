@@ -72,7 +72,7 @@ if len(amino_acids) > 2:
         aa.remove_H()
         distance_vector = np.array(OC_pos) - np.array(C_pos)
         distance = np.linalg.norm(distance_vector)
-        r = 1.32/distance       
+        r = 1.32/distance   #peptide bound length = 1.32A    
         aa.relocate_N(list(np.array(C_pos) + r * distance_vector))
         #aa.relocate_N(OC_pos)
         C_pos = aa.get_pos_C()
