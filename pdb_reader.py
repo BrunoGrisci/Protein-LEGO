@@ -15,7 +15,8 @@ class PDB_reader:
     CARBON = "C"
     BACKBONE_ATOMS = ("N", "CA", "C", "O")
     OC_ATOMS = ("C", "O", "OC", "HOC", "HC", "HO")
-    NH_ATOMS = ("N", "1H", "H1", "2H", "H2")
+    NH_ATOMS = ("N", "H", "1H", "H1", "2H", "H2", "3H", "H3")
+    NHC_ATOMS = ("N", "H", "1H", "H1", "2H", "H2", "3H", "H3", "CA")
     
     def __init__(self, file_name):
         self.file_name = file_name
@@ -287,8 +288,9 @@ class PDB_reader:
             ca_pos = self.atoms_pos[ca_i]                
             ia = 0
             for atom in zip(self.atoms, self.amino_acids_number):
-                if i > 0 and (atom[1] > i + min(self.amino_acids_number) or (atom[1] == i + min(self.amino_acids_number) and (atom[0] in self.OC_ATOMS))): 
-                    self.atoms_pos[ia] = self.rotate_atom_around_bond(dphi, self.atoms_pos[ia], n_pos, ca_pos)   
+                if (i > 0) and (atom[1] > i + min(self.amino_acids_number) or (atom[1] == i + min(self.amino_acids_number) and (atom[0] not in self.NHC_ATOMS))): 
+                    self.atoms_pos[ia] = self.rotate_atom_around_bond(dphi, self.atoms_pos[ia], n_pos, ca_pos)
+                    print(atom[0], atom[1])   
                 ia += 1        
             #ROTATE PSI    
             c_i  = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))  
@@ -299,8 +301,9 @@ class PDB_reader:
             ca_pos = self.atoms_pos[ca_i]
             ia = 0
             for atom in zip(self.atoms, self.amino_acids_number):
-                if atom[1] > i + min(self.amino_acids_number) and i + min(self.amino_acids_number) < max(self.amino_acids_number): 
-                    self.atoms_pos[ia] = self.rotate_atom_around_bond(dpsi, self.atoms_pos[ia], ca_pos, c_pos)          
+                if (i + min(self.amino_acids_number) < max(self.amino_acids_number)) and (atom[1] > i + min(self.amino_acids_number) or (atom[1] == i + min(self.amino_acids_number) and (atom[0] == "O"))): 
+                    self.atoms_pos[ia] = self.rotate_atom_around_bond(dpsi, self.atoms_pos[ia], ca_pos, c_pos)
+                    #print(atom[0], atom[1])          
                 ia += 1  
             #self.write_pdb("t" + str(i) + ".pdb")
             
