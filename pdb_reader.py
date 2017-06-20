@@ -183,8 +183,8 @@ class PDB_reader:
             elif (len(ref_atoms[a]) == 3 and "H" in ref_atoms[a] and "3" in ref_atoms[a]):
                 ra = ref_atoms[a].replace("3", "1")
                 ra = ra[-1]+ra[0:-1]
-                print("Changing: ")
-                print(ref_atoms[a], ra)
+                #print("Changing: ")
+                #print(ref_atoms[a], ra)
                 if (ra, ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                     i = zip(self.atoms, self.amino_acids_number).index((ra, ref_amino_acids[a]))
                     aux_atoms.append(self.atoms.pop(i))
@@ -195,8 +195,8 @@ class PDB_reader:
             elif (len(ref_atoms[a]) == 3 and "H" in ref_atoms[a] and "1" in ref_atoms[a]):
                 ra = ref_atoms[a].replace("1", "3")
                 ra = ra[1:]+ra[0]
-                print("Changing: ")
-                print(ref_atoms[a], ra)
+                #print("Changing: ")
+                #print(ref_atoms[a], ra)
                 if (ra, ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                     i = zip(self.atoms, self.amino_acids_number).index((ra, ref_amino_acids[a]))
                     aux_atoms.append(self.atoms.pop(i))
@@ -210,8 +210,8 @@ class PDB_reader:
                 aux_aa.append(None)
                 aux_aan.append(None)
                 aux_ms.append(None)
-                print("Not found: ")
-                print(ref_atoms[a], ref_amino_acids[a])
+                #print("Not found: ")
+                #print(ref_atoms[a], ref_amino_acids[a])
         #print(zip(self.atoms, self.amino_acids_number))
         self.atoms = copy.deepcopy(aux_atoms)
         self.atoms_pos = copy.deepcopy(aux_pos)
@@ -290,7 +290,7 @@ class PDB_reader:
             for atom in zip(self.atoms, self.amino_acids_number):
                 if (i > 0) and (atom[1] > i + min(self.amino_acids_number) or (atom[1] == i + min(self.amino_acids_number) and (atom[0] not in self.NHC_ATOMS))): 
                     self.atoms_pos[ia] = self.rotate_atom_around_bond(dphi, self.atoms_pos[ia], n_pos, ca_pos)
-                    print(atom[0], atom[1])   
+                    #print(atom[0], atom[1])   
                 ia += 1        
             #ROTATE PSI    
             c_i  = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))  
