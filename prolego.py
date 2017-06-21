@@ -10,10 +10,6 @@ def write_pdb(file_name, amino_acids):
     pdb = open(file_name, "w")
     for aa in amino_acids:
         for atom in aa.get_atoms():
-            #line = ""
-            #for info in atom:
-            #    line = line + str(info) + "    "
-            #line = line + "\n"
             line = "{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {:>2s}{:2s}".format(atom[0], atom[1], atom[2], " ", atom[3], " ", atom[4], " ", atom[5], atom[6], atom[7], atom[8], atom[9], " ", " ")
             line = line + "\n"
             pdb.write(line)
@@ -42,6 +38,8 @@ AMINO_ACIDS = {'A':'amino_acids/alanine.pdb',
                'W':'amino_acids/tryptophan.pdb', 
                'Y':'amino_acids/tyrosine.pdb', 
                'V':'amino_acids/valine.pdb'}
+
+PPL = 1.32 #peptide bound length = 1.32A
                
 aa_sequence = sys.argv[1]
 
@@ -51,12 +49,7 @@ for aa in aa_sequence:
     amino_acids.append(AA_reader(AMINO_ACIDS[aa]))
 
 for aa in amino_acids:
-    aa.send_origin()
-    #aa.rename_O()
-    
-#for aa in amino_acids:    
-#    for atom in aa.get_atoms():
-#        print(atom)    
+    aa.send_origin()   
 
 print("###################################################")
 
@@ -72,9 +65,8 @@ if len(amino_acids) > 2:
         aa.remove_H()
         distance_vector = np.array(OC_pos) - np.array(C_pos)
         distance = np.linalg.norm(distance_vector)
-        r = 1.32/distance   #peptide bound length = 1.32A    
+        r = PPL/distance   #peptide bound length = 1.32A    
         aa.relocate_N(list(np.array(C_pos) + r * distance_vector))
-        #aa.relocate_N(OC_pos)
         C_pos = aa.get_pos_C()
         OC_pos = aa.get_pos_OC()
         aa.remove_OH()
@@ -84,7 +76,6 @@ if len(amino_acids) > 2:
 if len(amino_acids) > 1:
     amino_acids[-1].remove_H()
     amino_acids[-1].relocate_N(list(np.array(C_pos) + r * distance_vector))
-    #amino_acids[-1].relocate_N(OC_pos)
     amino_acids[-1].set_amino_acid_index(aai+1)
 
 index = 1

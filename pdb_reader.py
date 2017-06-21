@@ -224,8 +224,32 @@ class PDB_reader:
         self.atoms_pos = [x for x in self.atoms_pos if x is not None] 
         self.amino_acids_number = [x for x in self.amino_acids_number if x is not None]  
         self.amino_acids = [x for x in self.amino_acids if x is not None]  
-        self.more_stuff = [x for x in self.more_stuff if x is not None] 
+        self.more_stuff = [x for x in self.more_stuff if x is not None]
         
+    def calc_angle_3(self, pos1, posC, pos2):
+        #https://stackoverflow.com/questions/19729831/angle-between-3-points-in-3d-space
+        '''In pseudo-code, the vector BA (call it v1) is:
+        v1 = {A.x - B.x, A.y - B.y, A.z - B.z}
+        Similarly the vector BC (call it v2) is:
+        v2 = {C.x - B.x, C.y - B.y, C.z - B.z}
+        The dot product of v1 and v2 is a function of the cosine of the angle between them (it's scaled by the product of their magnitudes). So first normalize v1 and v2:
+        v1mag = sqrt(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z)
+        v1norm = {v1.x / v1mag, v1.y / v1mag, v1.z / v1mag}
+        v2mag = sqrt(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z)
+        v2norm = {v2.x / v2mag, v2.y / v2mag, v2.z / v2mag}
+        Then calculate the dot product:
+        res = v1norm.x * v2norm.x + v1norm.y * v2norm.y + v1norm.z * v2norm.z
+        And finally, recover the angle:
+        angle = acos(res)'''
+        pos1 = np.array(pos1)
+        posC = np.array(posC)
+        pos2 = np.array(pos2)
+        bond1C = self.normalize(pos1 - posC)
+        bond2C = self.normalize(pos2 - posC)
+        dp = np.dot(bond1C, bond2C)
+        angle = np.arccos(dp)
+        return angle  
+
     def calc_angles(self, pos1, pos2, pos3, pos4):
         #https://math.stackexchange.com/questions/47059/how-do-i-calculate-a-dihedral-angle-given-cartesian-coordinates
         pos1 = np.array(pos1)
@@ -244,13 +268,50 @@ class PDB_reader:
         #angle = np.degrees(angle)
         return -angle
 
-    def get_omegas(self):
+    def get_peptide_bond_angles(self):
         angles = []
-        
         ca = self.get_ca_info()
         n  = self.get_N_info()
         c  = self.get_C_info()
+        for aa in xrange(len(ca)):
+            if aa < len(ca) - 1:
+                name       = ca[aa][1]
+                c_pos      =  c[aa][2]                
+                nex_n_pos  =  n[aa+1][2]
+                nex_ca_pos = ca[aa+1][2]
+                alpha = self.calc_angle_3(c_pos, nex_n_pos, nex_ca_pos)
+                angles.append(alpha)
+            else:
+                angles.append(2.0*math.pi)
+        return angles 
         
+    def set_peptide_bond_angles(self, angles=[]):
+        #https://pt.stackoverflow.com/questions/25923/vetores-e-%C3%82ngulos-geometria-molecular
+        n_aa = self.get_number_amino_acids()
+        if len(angles) == 0:
+            angles = [math.radians(120.0)]*n_aa
+        for i in xrange(n_aa):
+            if i + min(self.amino_acids_number) < max(self.amino_acids_number):
+                #ROTATE ALPHA
+                c_i   = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))     # C from aminoacid i
+                nn_i  = zip(self.atoms, self.amino_acids_number).index(("N",  i + 1 + min(self.amino_acids_number))) # N from aminoacid i+1
+                nca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i + 1 + min(self.amino_acids_number))) #CA from aminoacid i+1
+                current_alphas = self.get_peptide_bond_angles()
+                dalpha = math.atan2(math.sin(angles[i] - current_alphas[i]), math.cos(angles[i] - current_alphas[i]))
+                c_pos   = self.atoms_pos[c_i]
+                nn_pos  = self.atoms_pos[nn_i]
+                nca_pos = self.atoms_pos[nca_pos]
+                ia = 0
+                '''for atom in zip(self.atoms, self.amino_acids_number):
+                    if (atom[1] > i + 1 + min(self.amino_acids_number) or (atom[1] == i + 1 + min(self.amino_acids_number) and (atom[0] != "N"))): 
+                        self.atoms_pos[ia] = self.rotate_atom_around_bond(domega, self.atoms_pos[ia], c_pos, nn_pos)
+                    ia += 1'''                   
+        
+    def get_omegas(self):
+        angles = []        
+        ca = self.get_ca_info()
+        n  = self.get_N_info()
+        c  = self.get_C_info()       
         for aa in xrange(len(ca)):
             if aa < len(ca) - 1:
                 name       = ca[aa][1]
@@ -265,12 +326,10 @@ class PDB_reader:
         return angles        
 
     def get_angles(self):
-        angles = []
-    
+        angles = []   
         ca = self.get_ca_info()
         n  = self.get_N_info()
-        c  = self.get_C_info() 
-        
+        c  = self.get_C_info()      
         for aa in xrange(len(ca)):
             name   = ca[aa][1]
             if aa > 0:
@@ -292,19 +351,17 @@ class PDB_reader:
             angles.append(psi)
         return angles
 
-#    def rotate(self, angle):
-#        rot = self.rotaxis2m(angle, self.atoms_pos[20])
-#        self.atoms_pos = np.matrix.tolist(np.matrix(self.atoms_pos) * rot.transpose())
-
-    def rotate_omegas(self):
+    def rotate_omegas(self, angles=[]):
         n_aa = self.get_number_amino_acids()
+        if len(angles) == 0:
+            angles = [math.pi]*n_aa
         for i in xrange(n_aa):
             if i + min(self.amino_acids_number) < max(self.amino_acids_number):
                 #ROTATE OMEGA
                 c_i  = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number))) #C from aminoacid i
                 nn_i = zip(self.atoms, self.amino_acids_number).index(("N", i + 1 + min(self.amino_acids_number))) #N from aminoacid i+1
                 current_omegas = self.get_omegas()
-                domega = math.atan2(math.sin(math.pi - current_omegas[i]), math.cos(math.pi - current_omegas[i]))
+                domega = math.atan2(math.sin(angles[i] - current_omegas[i]), math.cos(angles[i] - current_omegas[i]))
                 c_pos  = self.atoms_pos[c_i]
                 nn_pos = self.atoms_pos[nn_i]
                 ia = 0
@@ -338,7 +395,7 @@ class PDB_reader:
             ca_pos = self.atoms_pos[ca_i]
             ia = 0
             for atom in zip(self.atoms, self.amino_acids_number):
-                if (i + min(self.amino_acids_number) < max(self.amino_acids_number)) and (atom[1] > i + min(self.amino_acids_number) or (atom[1] == i + min(self.amino_acids_number) and (atom[0] == "O"))): 
+                if (i+min(self.amino_acids_number) < max(self.amino_acids_number)) and (atom[1] > i+min(self.amino_acids_number) or (atom[1] == i+min(self.amino_acids_number) and (atom[0]=="O"))): 
                     self.atoms_pos[ia] = self.rotate_atom_around_bond(dpsi, self.atoms_pos[ia], ca_pos, c_pos)
                     #print(atom[0], atom[1])          
                 ia += 1  

@@ -37,7 +37,8 @@ pdb_mob = PDB_reader(mobile_file)
 pdb_mob.match_atoms(pdb_ref.get_atoms(), pdb_ref.get_amino_acids_index())
 pdb_mob.remove_nones()    
 pdb_ref.match_atoms(pdb_mob.get_atoms(), pdb_mob.get_amino_acids_index())
-pdb_ref.remove_nones()   
+pdb_ref.remove_nones()
+   
 pdb_mob.rotate_omegas()
     
 pop_size = 200    
