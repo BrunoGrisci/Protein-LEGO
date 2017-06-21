@@ -39,11 +39,12 @@ c = pdb.get_C_info()
 
 print(len(ca), len(n), len(c))
 
-print("A_A   PHI     PSI")
-print("-----------------")
+print("A_A   PHI     PSI     OMEGA")
+print("---------------------------")
 
 phis = []
 psis = []
+omegas = []
 
 angle_file = open(pdb_file.replace('.pdb', '_angles.txt'), 'w')
 
@@ -56,7 +57,8 @@ for aa in xrange(len(ca)):
     ca_pos = ca[aa][2]
     c_pos  =  c[aa][2]
     if aa < len(ca) - 1:
-        nex_n_pos = n[aa+1][2]
+        nex_n_pos  =  n[aa+1][2]
+        nex_ca_pos = ca[aa+1][2]
     
     if aa > 0: 
         phi = calc_angles(pre_c_pos, n_pos, ca_pos, c_pos)
@@ -65,12 +67,15 @@ for aa in xrange(len(ca)):
     
     if aa < len(ca) - 1: 
         psi = calc_angles(n_pos, ca_pos, c_pos, nex_n_pos)
+        omega = calc_angles(ca_pos, c_pos, nex_n_pos, nex_ca_pos)
     else:
         psi = 360.0
+        omega = 360.0
     
     phis.append(phi)
     psis.append(psi)
-    line = "{:3s}  {:7.2f}  {:7.2f}".format(name, phi, psi)
+    omegas.append(omega)
+    line = "{:3s}  {:7.2f}  {:7.2f}  {:7.2f}".format(name, phi, psi, omega)
     print(line)
     angle_file.write(line + '\n')
     

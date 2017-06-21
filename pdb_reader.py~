@@ -244,6 +244,26 @@ class PDB_reader:
         #angle = np.degrees(angle)
         return -angle
 
+    def get_omegas(self):
+        angles = []
+        
+        ca = self.get_ca_info()
+        n  = self.get_N_info()
+        c  = self.get_C_info()
+        
+        for aa in xrange(len(ca)):
+            if aa < len(ca) - 1:
+                name       = ca[aa][1]
+                ca_pos     = ca[aa][2]
+                c_pos      =  c[aa][2]                
+                nex_n_pos  =  n[aa+1][2]
+                nex_ca_pos = ca[aa+1][2]
+                omega = self.calc_angles(ca_pos, c_pos, nex_n_pos, nex_ca_pos)
+                angles.append(omega)
+            else:
+                angles.append(2.0*math.pi)
+        return angles        
+
     def get_angles(self):
         angles = []
     
@@ -272,9 +292,26 @@ class PDB_reader:
             angles.append(psi)
         return angles
 
-    def rotate(self, angle):
-        rot = self.rotaxis2m(angle, self.atoms_pos[20])
-        self.atoms_pos = np.matrix.tolist(np.matrix(self.atoms_pos) * rot.transpose())
+#    def rotate(self, angle):
+#        rot = self.rotaxis2m(angle, self.atoms_pos[20])
+#        self.atoms_pos = np.matrix.tolist(np.matrix(self.atoms_pos) * rot.transpose())
+
+    def rotate_omegas(self):
+        n_aa = self.get_number_amino_acids()
+        for i in xrange(n_aa):
+            if i + min(self.amino_acids_number) < max(self.amino_acids_number):
+                #ROTATE OMEGA
+                c_i  = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number))) #C from aminoacid i
+                nn_i = zip(self.atoms, self.amino_acids_number).index(("N", i + 1 + min(self.amino_acids_number))) #N from aminoacid i+1
+                current_omegas = self.get_omegas()
+                domega = math.atan2(math.sin(math.pi - current_omegas[i]), math.cos(math.pi - current_omegas[i]))
+                c_pos  = self.atoms_pos[c_i]
+                nn_pos = self.atoms_pos[nn_i]
+                ia = 0
+                for atom in zip(self.atoms, self.amino_acids_number):
+                    if (atom[1] > i + 1 + min(self.amino_acids_number) or (atom[1] == i + 1 + min(self.amino_acids_number) and (atom[0] != "N"))): 
+                        self.atoms_pos[ia] = self.rotate_atom_around_bond(domega, self.atoms_pos[ia], c_pos, nn_pos)
+                    ia += 1   
         
     def rotate_to(self, angles):
         n_aa = self.get_number_amino_acids()
