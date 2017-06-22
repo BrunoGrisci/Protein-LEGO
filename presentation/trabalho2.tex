@@ -148,7 +148,7 @@ Universidade Federal do Rio Grande do Sul \\ % Your institution for the title pa
 \item Correção de índices.
 \end{itemize}
 \footnotesize{
-*Posição ajustada para que o comprimento da ligação peptídica seja de $1.32\angstrom$.
+*Posição ajustada para que o comprimento da ligação peptídica seja de $1.32\angstrom$ e correção do ângulo da ligação.
 }
 \end{frame}
 
@@ -166,6 +166,7 @@ Sequência: VSCEDCPEHCSTQKAQAKCDNDKCVCEPI
 \begin{itemize}
   \item $\phi$ (phi): $C_{n-1} - N_{n} - C_{\alpha n} - C_{n}$
   \item $\psi$ (psi): $N_{n} - C_{\alpha n} - C_{n} - N_{n+1}$
+  \item $\omega$ (omega): $C_{\alpha n} - C_{n} - N_{n+1} - C_{\alpha n+1}$
 \end{itemize}
 \end{frame}
 
@@ -216,6 +217,117 @@ GLY         &  62.56   &  31.90  \\
 \section{Questão 2} 
 %------------------------------------------------
 
+\begin{frame}
+\frametitle{1PLX-P}
+Sequência: YGGFM
+
+$RMSD_{C_\alpha}: 2.931457373$
+
+$RMSD_{backbone}: 2.91612536719$
+
+$RMSD_{all}: 4.75262535547$ 
+
+\begin{figure}
+\includegraphics[width=1.0\linewidth]{1PLX-P.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Cálculo do ângulo entre 3 átomos}
+\begin{itemize}
+ \item $P_{1}, P_{C}, P_{2}$
+ \item $\vec{bond_{1C}} = \frac{P_{1} - P_{C}}{\parallel P_{1} - P_{C} \parallel}$
+ \item $\vec{bond_{2C}} = \frac{P_{2} - P_{C}}{\parallel P_{2} - P_{C} \parallel}$
+ \item $\theta = arccos(\vec{bond_{1C}} \cdot \vec{bond_{2C}})$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Rotação da ligação de 3 átomos}
+
+\begin{itemize}
+ \item $\theta, Q_{0}, P_{1}, P_{C}, P_{2}$
+ \item $c = cos(\theta), s = sin(\theta), t = 1 - cos(\theta)$
+ \item $Q = Q_{0} - P_{C}$
+ \item $\vec{bond_{1C}} = \frac{P_{1} - P_{C}}{\parallel P_{1} - P_{C} \parallel}$
+ \item $\vec{bond_{2C}} = \frac{P_{2} - P_{C}}{\parallel P_{2} - P_{C} \parallel}$
+ \item $\vec{k} = \frac{bond_{1C} \times bond_{2C}}{\parallel bond_{1C} \times bond_{2C} \parallel}$
+ 
+ \item $R_{3,3} = 
+	\begin{pmatrix}
+	  c + \vec{k}_{x} \cdot \vec{k}_{x} \cdot t & \vec{k}_{x} \cdot \vec{k}_{y} \cdot t - \vec{k}_{z} \cdot s & \vec{k}_{x} \cdot \vec{k}_{z} \cdot t + \vec{k}_{y} \cdot s \\[0.01em]
+	  \vec{k}_{x} \cdot \vec{k}_{y} \cdot t + \vec{k}_{z} \cdot s  & c + \vec{k}_{y} \cdot \vec{k}_{y} \cdot t & \vec{k}_{y} \cdot \vec{k}_{z} \cdot t - \vec{k}_{x} \cdot s \\[0.01em]
+	  \vec{k}_{z} \cdot \vec{k}_{x} \cdot t - \vec{k}_{y} \cdot s  & \vec{k}_{z} \cdot \vec{k}_{y} \cdot t + \vec{k}_{x} \cdot s & c + \vec{k}_{z} \cdot \vec{k}_{z} \cdot t \\[0.01em]
+	\end{pmatrix}$
+ 
+ \item $Q_{1} = Q \times R^{T} + P_{C}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Rotação de ângulo diedro}
+
+Rodrigues' rotation formula:
+
+\begin{itemize}
+ \item $\theta, P_{0}, bond_{0}, bond_{1}$
+ \item $\vec{v} = P_{0} - bond_{0}$
+ \item $\vec{k} = \frac{bond_{1} - bond_{0}}{\parallel bond_{1} - bond_{0} \parallel}$
+ \item $r = \vec{v}  \cdot cos(\theta) + \vec{k} \times \vec{v} \cdot sin(\theta) + \vec{k} \cdot \vec{v} \cdot (1 - cos(\theta))$
+ \item $P_{1} = r +  bond_{0}$
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Otimização}
+Particle Swarm Optimization
+\begin{itemize}
+  \item Minimização
+  \item Função de avaliação: $RMSD_{all}$
+  \item Dimensões: $2 \times \parallel AA \parallel - 2$
+  \item Limites: $[-\pi, \pi]$
+  \item População: $200$
+  \item Iterações: $1000$
+
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Minimização do RMSD}
+\begin{figure}
+\includegraphics[width=0.7\linewidth]{1PLX-F_rmsd.png}
+\end{figure}
+Tempo de execução: $65$ minutos
+\end{frame}
+
+\begin{frame}
+\frametitle{Resultados}
+$RMSD_{C_\alpha}: 0.38657032646$
+
+$RMSD_{backbone}: 0.827079038808$
+
+$RMSD_{all}: 2.37386628213$ 
+
+\begin{figure}
+\includegraphics[width=0.5\linewidth]{1PLX-F.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ângulos (1PLX x 1PLX-F)}
+\begin{table}[]
+\centering
+\label{my-label}
+\begin{tabular}{llll}
+AA & PHI             &  PSI              &  OMEGA             \\
+TYR         & 360.00 x 360.00 &  176.63 x -110.52 &  179.86 x -179.98  \\
+GLY         & 148.48 x 124.15 &  -21.96 x    2.58 &  179.81 x -179.97  \\
+GLY         & 114.02 x  84.56 &   29.89 x   27.43 &  179.75 x  179.97  \\
+PHE         & -88.00 x -71.94 &  -38.16 x  -94.85 & -179.95 x  179.99  \\
+MET         & -74.24 x -14.96 &  360.00 x  360.00 &  360.00 x  360.00
+\end{tabular}
+\end{table}
+\end{frame}
 
 %------------------------------------------------
 

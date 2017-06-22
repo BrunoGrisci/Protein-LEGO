@@ -40,11 +40,11 @@ pdb_ref.match_atoms(pdb_mob.get_atoms(), pdb_mob.get_amino_acids_index())
 pdb_ref.remove_nones()
    
 pdb_mob.rotate_omegas()
-pdb.set_peptide_bond_angles()
+pdb_mob.set_peptide_bond_angles()
     
 pop_size = 200    
 dim = 2 * pdb_ref.get_number_amino_acids() - 2
-min_iterations = 10
+min_iterations = 700
 
 start_time = time.time()
 
@@ -68,7 +68,7 @@ print(pso.get_best_score())
 print("Finished run")
    
 pdb_mob.rotate_to([2.0*math.pi] + pso.get_best_location() + [2.0*math.pi])
-pdb_mob.write_pdb(reference_file.replace(".pdb", "-F.png"))
+pdb_mob.write_pdb(reference_file.replace(".pdb", "-F.pdb"))
 
 print("###")
 angles = pdb_mob.get_angles()
@@ -76,7 +76,7 @@ for a in xrange(0, pdb_mob.get_number_amino_acids()*2, 2):
     print(round(math.degrees(angles[a]),2), round(math.degrees(angles[a+1]),2))
 
 plt.plot(scores_over_time)
-plt.title('RMSD over iterations: ' + reference_file.replace(".pdb", "-F.png"))
+plt.title('RMSD over iterations: ' + reference_file.replace(".pdb", "-F"))
 plt.xlabel('Iterations')
 plt.ylabel('RMSD')
 fig = plt.gcf()

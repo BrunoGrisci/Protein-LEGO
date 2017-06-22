@@ -334,7 +334,6 @@ class PDB_reader:
                         self.atoms_pos[ia] = self.bend_bonds(dalpha, self.atoms_pos[ia], c_pos, nn_pos, nca_pos)
                     elif nh_i >= 0 and atom[1] == i + 1 + min(self.amino_acids_number) and atom[0] in self.NH_ATOMS and atom[0] != "N":
                         self.atoms_pos[ia] = self.bend_bonds(dalphaH, self.atoms_pos[ia], c_pos, nn_pos, nh_pos)    
-                        print(atom[0], atom[1])
                     ia += 1                   
 
     def bend_bonds(self, theta, atom_pos, pos1, posC, pos2):
