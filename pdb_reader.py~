@@ -284,9 +284,25 @@ class PDB_reader:
             else:
                 angles.append(2.0*math.pi)
         return angles 
+
+    def get_peptide_bond_H_angles(self):
+        angles = []
+        ca = self.get_ca_info()
+        n  = self.get_N_info()
+        c  = self.get_C_info()
+        for aa in xrange(len(ca)):
+            if aa < len(ca) - 1:
+                name       = ca[aa][1]
+                c_pos      =  c[aa][2]                
+                nex_n_pos  =  n[aa+1][2]
+                nex_ca_pos = ca[aa+1][2]
+                alpha = self.calc_angle_3(c_pos, nex_n_pos, nex_ca_pos)
+                angles.append(alpha)
+            else:
+                angles.append(2.0*math.pi)
+        return angles 
         
     def set_peptide_bond_angles(self, angles=[]):
-        #https://pt.stackoverflow.com/questions/25923/vetores-e-%C3%82ngulos-geometria-molecular
         n_aa = self.get_number_amino_acids()
         if len(angles) == 0:
             angles = [math.radians(120.0)]*n_aa
@@ -295,17 +311,53 @@ class PDB_reader:
                 #ROTATE ALPHA
                 c_i   = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))     # C from aminoacid i
                 nn_i  = zip(self.atoms, self.amino_acids_number).index(("N",  i + 1 + min(self.amino_acids_number))) # N from aminoacid i+1
+                nh_i  = -1.0
+                for a in self.NH_ATOMS:
+                    if a != "N":                                                 
+                        nh_i  = zip(self.atoms, self.amino_acids_number).index((a,  i + 1 + min(self.amino_acids_number))) if (a,  i + 1 + min(self.amino_acids_number)) in zip(self.atoms, self.amino_acids_number) else -1
+                        if nh_i >= 0:
+                            break
+                        
                 nca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i + 1 + min(self.amino_acids_number))) #CA from aminoacid i+1
                 current_alphas = self.get_peptide_bond_angles()
                 dalpha = math.atan2(math.sin(angles[i] - current_alphas[i]), math.cos(angles[i] - current_alphas[i]))
                 c_pos   = self.atoms_pos[c_i]
                 nn_pos  = self.atoms_pos[nn_i]
-                nca_pos = self.atoms_pos[nca_pos]
+                if nh_i >= 0:
+                    nh_pos  = self.atoms_pos[nh_i]
+                    current_alphaH = self.calc_angle_3(c_pos, nn_pos, nh_pos)
+                    dalphaH = math.atan2(math.sin(angles[i] - current_alphaH), math.cos(angles[i] - current_alphaH)) 
+                nca_pos = self.atoms_pos[nca_i]
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
-                    if (atom[1] > i + 1 + min(self.amino_acids_number) or (atom[1] == i + 1 + min(self.amino_acids_number) and (atom[0] != "N"))): 
-                        self.atoms_pos[ia] = self.rotate_atom_around_bond(domega, self.atoms_pos[ia], c_pos, nn_pos)
+                    if (atom[1] > i + 1 + min(self.amino_acids_number) or (atom[1] == i + 1 + min(self.amino_acids_number) and (atom[0] not in self.NH_ATOMS))): 
+                        self.atoms_pos[ia] = self.bend_bonds(dalpha, self.atoms_pos[ia], c_pos, nn_pos, nca_pos)
+                    elif nh_i >= 0 and atom[1] == i + 1 + min(self.amino_acids_number) and atom[0] in self.NH_ATOMS and atom[0] != "N":
+                        self.atoms_pos[ia] = self.bend_bonds(dalphaH, self.atoms_pos[ia], c_pos, nn_pos, nh_pos)    
+                        print(atom[0], atom[1])
                     ia += 1                   
+
+    def bend_bonds(self, theta, atom_pos, pos1, posC, pos2):
+        #https://pt.stackoverflow.com/questions/25923/vetores-e-%C3%82ngulos-geometria-molecular
+        posC = np.array(posC)
+        atom_pos = np.array(atom_pos) - posC
+        pos1 = np.array(pos1) - posC
+        pos2 = np.array(pos2) - posC
+        bond1C = self.normalize(pos1)
+        bond2C = self.normalize(pos2)
+        ortho = self.normalize(np.cross(bond1C, bond2C))
+
+        c = np.cos(theta)
+        s = np.sin(theta)
+        t = 1.0 - c
+
+        rot = np.matrix([[c + ortho[0] * ortho[0] * t, ortho[0] * ortho[1] * t - ortho[2] * s, ortho[0] * ortho[2] * t + ortho[1] * s], 
+                         [ortho[0] * ortho[1] * t + ortho[2] * s, c + ortho[1] * ortho[1] * t, ortho[1] * ortho[2] * t - ortho[0] * s],
+                         [ortho[2] * ortho[0] * t - ortho[1] * s, ortho[2] * ortho[1] * t + ortho[0] * s, c + ortho[2] * ortho[2] * t]])
+                         
+        new_pos = np.matrix.tolist(np.matrix(atom_pos) * rot.transpose())[0]               
+        new_pos = list(np.array(new_pos) + posC)
+        return new_pos
         
     def get_omegas(self):
         angles = []        

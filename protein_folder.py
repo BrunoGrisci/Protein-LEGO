@@ -40,6 +40,7 @@ pdb_ref.match_atoms(pdb_mob.get_atoms(), pdb_mob.get_amino_acids_index())
 pdb_ref.remove_nones()
    
 pdb_mob.rotate_omegas()
+pdb.set_peptide_bond_angles()
     
 pop_size = 200    
 dim = 2 * pdb_ref.get_number_amino_acids() - 2

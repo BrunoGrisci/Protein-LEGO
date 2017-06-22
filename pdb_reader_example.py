@@ -59,15 +59,25 @@ pis = [math.radians(360.0),math.radians(176.63),
        math.radians(-83.45),math.radians(10.99),
        math.radians(-134.55),math.radians(360.00)]''' 
 
+for a in pdb.get_peptide_bond_angles():
+    print(math.degrees(a))
+
 print("example start")
 print(len(pdb.get_all_pos()))
-#for p in pdb.get_all_pos():
-#    print(p)
 
 pdb.rotate_omegas()
+pdb.set_peptide_bond_angles()
 pdb.rotate_to(pis)
 
-print(pdb.get_peptide_bond_angles())
+print("########")
+print("PEPTIDE BOND")
+for a in pdb.get_peptide_bond_angles():
+    print(round(math.degrees(a),2))
+
+print("########")
+print("OMEGA")
+for a in pdb.get_omegas():
+    print(round(math.degrees(a),2))
 
 print("########")
 angles = pdb.get_angles()
@@ -76,9 +86,5 @@ for a in xrange(0, naa*2, 2):
 
 print("example end")
 print(len(pdb.get_all_pos()))
-#for p in pdb.get_all_pos():
-#    print(p)
 
-
-    
 pdb.write_pdb("test.pdb")
