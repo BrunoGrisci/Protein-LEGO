@@ -319,15 +319,15 @@ class PDB_reader:
                             break
                         
                 nca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i + 1 + min(self.amino_acids_number))) #CA from aminoacid i+1
-                current_alphas = self.get_peptide_bond_angles()
-                dalpha = math.atan2(math.sin(angles[i] - current_alphas[i]), math.cos(angles[i] - current_alphas[i]))
                 c_pos   = self.atoms_pos[c_i]
                 nn_pos  = self.atoms_pos[nn_i]
+                nca_pos = self.atoms_pos[nca_i]
                 if nh_i >= 0:
                     nh_pos  = self.atoms_pos[nh_i]
                     current_alphaH = self.calc_angle_3(c_pos, nn_pos, nh_pos)
                     dalphaH = math.atan2(math.sin(angles[i] - current_alphaH), math.cos(angles[i] - current_alphaH)) 
-                nca_pos = self.atoms_pos[nca_i]
+                current_alpha = self.calc_angle_3(c_pos, nn_pos, nca_pos)
+                dalpha = math.atan2(math.sin(angles[i] - current_alpha), math.cos(angles[i] - current_alpha))
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
                     if (atom[1] > i + 1 + min(self.amino_acids_number) or (atom[1] == i + 1 + min(self.amino_acids_number) and (atom[0] not in self.NH_ATOMS))): 
@@ -409,12 +409,16 @@ class PDB_reader:
         for i in xrange(n_aa):
             if i + min(self.amino_acids_number) < max(self.amino_acids_number):
                 #ROTATE OMEGA
-                c_i  = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number))) #C from aminoacid i
-                nn_i = zip(self.atoms, self.amino_acids_number).index(("N", i + 1 + min(self.amino_acids_number))) #N from aminoacid i+1
-                current_omegas = self.get_omegas()
-                domega = math.atan2(math.sin(angles[i] - current_omegas[i]), math.cos(angles[i] - current_omegas[i]))
-                c_pos  = self.atoms_pos[c_i]
-                nn_pos = self.atoms_pos[nn_i]
+                ca_i   = zip(self.atoms, self.amino_acids_number).index(("CA",  i + min(self.amino_acids_number))) #CA from aminoacid i
+                c_i    = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number))) #C from aminoacid i
+                nn_i   = zip(self.atoms, self.amino_acids_number).index(("N", i + 1 + min(self.amino_acids_number))) #N from aminoacid i+1
+                nca_i  = zip(self.atoms, self.amino_acids_number).index(("CA", i + 1 + min(self.amino_acids_number))) #CA from aminoacid i+1
+                ca_pos  = self.atoms_pos[ca_i]
+                c_pos   = self.atoms_pos[c_i]
+                nn_pos  = self.atoms_pos[nn_i]
+                nca_pos = self.atoms_pos[nca_i]
+                current_omega = self.calc_angles(ca_pos, c_pos, nn_pos, nca_pos)
+                domega = math.atan2(math.sin(angles[i] - current_omega), math.cos(angles[i] - current_omega))
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
                     if (atom[1] > i + 1 + min(self.amino_acids_number) or (atom[1] == i + 1 + min(self.amino_acids_number) and (atom[0] != "N"))): 
@@ -425,32 +429,39 @@ class PDB_reader:
         n_aa = self.get_number_amino_acids()
         for i in xrange(n_aa):     
             #ROTATE PHI
-            n_i = zip(self.atoms, self.amino_acids_number).index(("N", i + min(self.amino_acids_number)))   
-            ca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i + min(self.amino_acids_number)))
-            current_angles = self.get_angles()
-            dphi = math.atan2(math.sin(angles[2*i] - current_angles[2*i]), math.cos(angles[2*i] - current_angles[2*i]))
-            n_pos = self.atoms_pos[n_i]
-            ca_pos = self.atoms_pos[ca_i]                
-            ia = 0
-            for atom in zip(self.atoms, self.amino_acids_number):
-                if (i > 0) and (atom[1] > i + min(self.amino_acids_number) or (atom[1] == i + min(self.amino_acids_number) and (atom[0] not in self.NHC_ATOMS))): 
-                    self.atoms_pos[ia] = self.rotate_atom_around_bond(dphi, self.atoms_pos[ia], n_pos, ca_pos)
-                    #print(atom[0], atom[1])   
-                ia += 1        
-            #ROTATE PSI    
-            c_i  = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))  
-            ca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i + min(self.amino_acids_number)))
-            current_angles = self.get_angles()
-            dpsi = math.atan2(math.sin(angles[2*i+1] - current_angles[2*i+1]), math.cos(angles[2*i+1] - current_angles[2*i+1]))              
-            c_pos = self.atoms_pos[c_i] 
-            ca_pos = self.atoms_pos[ca_i]
-            ia = 0
-            for atom in zip(self.atoms, self.amino_acids_number):
-                if (i+min(self.amino_acids_number) < max(self.amino_acids_number)) and (atom[1] > i+min(self.amino_acids_number) or (atom[1] == i+min(self.amino_acids_number) and (atom[0]=="O"))): 
-                    self.atoms_pos[ia] = self.rotate_atom_around_bond(dpsi, self.atoms_pos[ia], ca_pos, c_pos)
-                    #print(atom[0], atom[1])          
-                ia += 1  
-            #self.write_pdb("t" + str(i) + ".pdb")
+            if i > 0:
+                pc_i  = zip(self.atoms, self.amino_acids_number).index(("C",  i-1 + min(self.amino_acids_number)))
+                n_i   = zip(self.atoms, self.amino_acids_number).index(("N",  i + min(self.amino_acids_number)))   
+                ca_i  = zip(self.atoms, self.amino_acids_number).index(("CA", i + min(self.amino_acids_number)))
+                c_i   = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))
+                pc_pos = self.atoms_pos[pc_i]
+                n_pos  = self.atoms_pos[n_i]
+                ca_pos = self.atoms_pos[ca_i]
+                c_pos  = self.atoms_pos[c_i] 
+                current_angle = self.calc_angles(pc_pos, n_pos, ca_pos, c_pos)
+                dphi = math.atan2(math.sin(angles[2*i] - current_angle), math.cos(angles[2*i] - current_angle))    
+                ia = 0
+                for atom in zip(self.atoms, self.amino_acids_number):
+                    if (atom[1] > i + min(self.amino_acids_number) or (atom[1] == i + min(self.amino_acids_number) and (atom[0] not in self.NHC_ATOMS))): 
+                        self.atoms_pos[ia] = self.rotate_atom_around_bond(dphi, self.atoms_pos[ia], n_pos, ca_pos)   
+                    ia += 1        
+            #ROTATE PSI 
+            if i + min(self.amino_acids_number) < max(self.amino_acids_number):
+                n_i  = zip(self.atoms, self.amino_acids_number).index(("N",  i + min(self.amino_acids_number)))
+                ca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i + min(self.amino_acids_number)))
+                c_i  = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))
+                nn_i = zip(self.atoms, self.amino_acids_number).index(("N",  i+1 + min(self.amino_acids_number)))  
+                n_pos  = self.atoms_pos[n_i]
+                ca_pos = self.atoms_pos[ca_i]
+                c_pos  = self.atoms_pos[c_i]
+                nn_pos = self.atoms_pos[nn_i] 
+                current_angle = self.calc_angles(n_pos, ca_pos, c_pos, nn_pos)                
+                dpsi = math.atan2(math.sin(angles[2*i+1] - current_angle), math.cos(angles[2*i+1] - current_angle))              
+                ia = 0
+                for atom in zip(self.atoms, self.amino_acids_number):
+                    if (atom[1] > i+min(self.amino_acids_number) or (atom[1] == i+min(self.amino_acids_number) and (atom[0]=="O"))): 
+                        self.atoms_pos[ia] = self.rotate_atom_around_bond(dpsi, self.atoms_pos[ia], ca_pos, c_pos)         
+                    ia += 1  
             
     def normalize(self, v):
         norm = np.linalg.norm(v)

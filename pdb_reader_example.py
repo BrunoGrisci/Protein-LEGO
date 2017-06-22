@@ -57,7 +57,7 @@ pis = [math.radians(360.0),math.radians(176.63),
        math.radians(-45.89),math.radians(-34.36),
        math.radians(-74.49),math.radians(-47.76),
        math.radians(-83.45),math.radians(10.99),
-       math.radians(-134.55),math.radians(360.00)]''' 
+       math.radians(-134.55),math.radians(360.00)]'''
 
 for a in pdb.get_peptide_bond_angles():
     print(math.degrees(a))
