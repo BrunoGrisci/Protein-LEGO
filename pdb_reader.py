@@ -22,38 +22,37 @@ class PDB_reader:
         self.file_name = file_name
         self.sequence = []
         self.atoms = []
+        self.atoms_full = []
         self.atoms_pos = []
         self.amino_acids = []
         self.amino_acids_number = []
         self.more_stuff = []
         self.read_pdb()
+
+
+#line = "{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {:>2s}{:2s}".format(self.ATOM_TAG, i+1, self.atoms[i], " ", self.amino_acids[i], " ", self.amino_acids_number[i], " ", self.atoms_pos[i][0], self.atoms_pos[i][1], self.atoms_pos[i][2], self.more_stuff[i][0], self.more_stuff[i][1], " ", " ")
         
     def read_pdb(self):
         stop = False
         pdb = open(self.file_name, "r")       
         while not stop:
-            line = pdb.readline()
-            if not line:
+            original_line = pdb.readline()
+            if not original_line:
                 stop = True
             else:
-                line = line.split()
+                line = original_line.split()
                 if line[0] == self.END_TAG:
                     stop = True
-                elif line[0] == self.ATOM_TAG:
-                    atom = line[2]
-                    aa = line[3]
-                    if self.is_number(line[4]):
-                        amino_acid = int(line[4])
-                    elif self.is_number(line[5]):
-                        amino_acid = int(line[5])
-                    pos_init = 0
-                    for i in xrange(len(line)):
-                        if "." in line[i]:
-                            pos_init = i
-                            break
-                    pos  = map(float, line[pos_init:pos_init+3])
-                    extra = map(float, line[pos_init+3:pos_init+5])
+                elif line[0] == self.ATOM_TAG:                    
+                    atom_full  = original_line[12:16]
+                    atom       = atom_full.replace(" ", "")
+                    aa         = original_line[17:20].replace(" ", "")
+                    amino_acid = int(original_line[22:26])
+                    pos        = map(float, [original_line[30:38], original_line[38:46], original_line[46:54]])
+                    extra      = map(float, [original_line[54:60], original_line[60:66]])
+                    
                     self.atoms.append(atom)
+                    self.atoms_full.append(atom_full)
                     self.atoms_pos.append(pos)
                     self.amino_acids.append(aa)
                     self.amino_acids_number.append(amino_acid)    
@@ -130,6 +129,7 @@ class PDB_reader:
         
     def match_atoms(self, ref_atoms, ref_amino_acids):
         aux_atoms = []
+        aux_atomsf = []
         aux_pos = []
         aux_aa = []
         aux_aan = []
@@ -141,6 +141,7 @@ class PDB_reader:
             elif (ref_atoms[a], ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                 i = zip(self.atoms, self.amino_acids_number).index((ref_atoms[a], ref_amino_acids[a]))
                 aux_atoms.append(self.atoms.pop(i))
+                aux_atomsf.append(self.atoms_full.pop(i))
                 aux_pos.append(self.atoms_pos.pop(i))
                 aux_aa.append(self.amino_acids_number.pop(i))
                 aux_aan.append(self.amino_acids.pop(i))
@@ -148,6 +149,7 @@ class PDB_reader:
             elif (ref_atoms[a][1:]+ref_atoms[a][0], ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                 i = zip(self.atoms, self.amino_acids_number).index((ref_atoms[a][1:]+ref_atoms[a][0], ref_amino_acids[a]))
                 aux_atoms.append(self.atoms.pop(i))
+                aux_atomsf.append(self.atoms_full.pop(i))
                 aux_pos.append(self.atoms_pos.pop(i))
                 aux_aa.append(self.amino_acids_number.pop(i))
                 aux_aan.append(self.amino_acids.pop(i))
@@ -155,6 +157,7 @@ class PDB_reader:
             elif (ref_atoms[a][-1]+ref_atoms[a][0:-1], ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                 i = zip(self.atoms, self.amino_acids_number).index((ref_atoms[a][-1]+ref_atoms[a][0:-1], ref_amino_acids[a]))
                 aux_atoms.append(self.atoms.pop(i))
+                aux_atomsf.append(self.atoms_full.pop(i))
                 aux_pos.append(self.atoms_pos.pop(i))
                 aux_aa.append(self.amino_acids_number.pop(i))
                 aux_aan.append(self.amino_acids.pop(i))
@@ -162,6 +165,7 @@ class PDB_reader:
             elif (ref_atoms[a] == "OXT" and ("OC", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
                     i = zip(self.atoms, self.amino_acids_number).index(("OC", ref_amino_acids[a]))
                     aux_atoms.append(self.atoms.pop(i))
+                    aux_atomsf.append(self.atoms_full.pop(i))
                     aux_pos.append(self.atoms_pos.pop(i))
                     aux_aa.append(self.amino_acids_number.pop(i))
                     aux_aan.append(self.amino_acids.pop(i))
@@ -169,6 +173,7 @@ class PDB_reader:
             elif (ref_atoms[a] == "OC" and ("OXT", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
                     i = zip(self.atoms, self.amino_acids_number).index(("OXT", ref_amino_acids[a]))
                     aux_atoms.append(self.atoms.pop(i))
+                    aux_atomsf.append(self.atoms_full.pop(i))
                     aux_pos.append(self.atoms_pos.pop(i))
                     aux_aa.append(self.amino_acids_number.pop(i))
                     aux_aan.append(self.amino_acids.pop(i))
@@ -176,6 +181,7 @@ class PDB_reader:
             elif (ref_atoms[a] == "H" and ("1H", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
                     i = zip(self.atoms, self.amino_acids_number).index(("1H", ref_amino_acids[a]))
                     aux_atoms.append(self.atoms.pop(i))
+                    aux_atomsf.append(self.atoms_full.pop(i))
                     aux_pos.append(self.atoms_pos.pop(i))
                     aux_aa.append(self.amino_acids_number.pop(i))
                     aux_aan.append(self.amino_acids.pop(i))
@@ -183,6 +189,7 @@ class PDB_reader:
             elif (ref_atoms[a] == "1H" and ("H", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
                     i = zip(self.atoms, self.amino_acids_number).index(("H", ref_amino_acids[a]))
                     aux_atoms.append(self.atoms.pop(i))
+                    aux_atomsf.append(self.atoms_full.pop(i))
                     aux_pos.append(self.atoms_pos.pop(i))
                     aux_aa.append(self.amino_acids_number.pop(i))
                     aux_aan.append(self.amino_acids.pop(i))
@@ -195,6 +202,7 @@ class PDB_reader:
                 if (ra, ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                     i = zip(self.atoms, self.amino_acids_number).index((ra, ref_amino_acids[a]))
                     aux_atoms.append(self.atoms.pop(i))
+                    aux_atomsf.append(self.atoms_full.pop(i))
                     aux_pos.append(self.atoms_pos.pop(i))
                     aux_aa.append(self.amino_acids_number.pop(i))
                     aux_aan.append(self.amino_acids.pop(i))
@@ -207,12 +215,14 @@ class PDB_reader:
                 if (ra, ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                     i = zip(self.atoms, self.amino_acids_number).index((ra, ref_amino_acids[a]))
                     aux_atoms.append(self.atoms.pop(i))
+                    aux_atomsf.append(self.atoms_full.pop(i))
                     aux_pos.append(self.atoms_pos.pop(i))
                     aux_aa.append(self.amino_acids_number.pop(i))
                     aux_aan.append(self.amino_acids.pop(i))
                     aux_ms.append(self.more_stuff.pop(i))
             else:
                 aux_atoms.append(None)
+                aux_atomsf.append(None)
                 aux_pos.append(None)
                 aux_aa.append(None)
                 aux_aan.append(None)
@@ -221,13 +231,15 @@ class PDB_reader:
                 #print(ref_atoms[a], ref_amino_acids[a])
         #print(zip(self.atoms, self.amino_acids_number))
         self.atoms = copy.deepcopy(aux_atoms)
+        self.atoms_full = copy.deepcopy(aux_atomsf)
         self.atoms_pos = copy.deepcopy(aux_pos)
         self.amino_acids_number = copy.deepcopy(aux_aa)
         self.amino_acids = copy.deepcopy(aux_aan)
         self.more_stuff = copy.deepcopy(aux_ms)
         
     def remove_nones(self):
-        self.atoms = [x for x in self.atoms if x is not None] 
+        self.atoms = [x for x in self.atoms if x is not None]
+        self.atoms_full = [x for x in self.atoms if x is not None] 
         self.atoms_pos = [x for x in self.atoms_pos if x is not None] 
         self.amino_acids_number = [x for x in self.amino_acids_number if x is not None]  
         self.amino_acids = [x for x in self.amino_acids if x is not None]  
@@ -420,10 +432,10 @@ class PDB_reader:
                 pc_i   = zip(self.atoms, self.amino_acids_number).index(("C",   i-1 + min(self.amino_acids_number))) #C from aminoacid i-1
                 n_i    = zip(self.atoms, self.amino_acids_number).index(("N",   i + min(self.amino_acids_number))) #N from aminoacid i
                 ca_i   = zip(self.atoms, self.amino_acids_number).index(("CA",  i + min(self.amino_acids_number))) #CA from aminoacid i
-                pca_pos = self.atoms_pos[ca_i]
-                pc_pos  = self.atoms_pos[c_i]
-                n_pos   = self.atoms_pos[nn_i]
-                ca_pos  = self.atoms_pos[nca_i]
+                pca_pos = self.atoms_pos[pca_i]
+                pc_pos  = self.atoms_pos[pc_i]
+                n_pos   = self.atoms_pos[n_i]
+                ca_pos  = self.atoms_pos[ca_i]
                 current_omega = self.calc_angles(pca_pos, pc_pos, n_pos, ca_pos)
                 domega = math.atan2(math.sin(angles[i] - current_omega), math.cos(angles[i] - current_omega))
                 ia = 0
@@ -494,7 +506,7 @@ class PDB_reader:
     def write_pdb(self, file_name):
         pdb = open(file_name, "w")
         for i in xrange(len(self.atoms)):
-            line = "{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {:>2s}{:2s}".format(self.ATOM_TAG, i+1, self.atoms[i], " ", self.amino_acids[i], " ", self.amino_acids_number[i], " ", self.atoms_pos[i][0], self.atoms_pos[i][1], self.atoms_pos[i][2], self.more_stuff[i][0], self.more_stuff[i][1], " ", " ")
+            line = "{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {:>2s}{:2s}".format(self.ATOM_TAG, i+1, self.atoms_full[i], " ", self.amino_acids[i], " ", self.amino_acids_number[i], " ", self.atoms_pos[i][0], self.atoms_pos[i][1], self.atoms_pos[i][2], self.more_stuff[i][0], self.more_stuff[i][1], " ", " ")
             line = line + "\n"
             pdb.write(line)
         pdb.write(self.END_TAG)

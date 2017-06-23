@@ -22,6 +22,8 @@ print(c)
 
 print(len(ca), len(n), len(c))
 
+print(pdb.atoms_full)
+
 angles = pdb.get_angles()
 for a in xrange(0, naa*2, 2):
     print(round(math.degrees(angles[a]),2), round(math.degrees(angles[a+1]),2))
