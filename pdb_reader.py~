@@ -20,6 +20,7 @@ class PDB_reader:
     
     def __init__(self, file_name):
         self.file_name = file_name
+        self.sequence = []
         self.atoms = []
         self.atoms_pos = []
         self.amino_acids = []
@@ -29,8 +30,7 @@ class PDB_reader:
         
     def read_pdb(self):
         stop = False
-        pdb = open(self.file_name, "r")
-        
+        pdb = open(self.file_name, "r")       
         while not stop:
             line = pdb.readline()
             if not line:
@@ -59,7 +59,11 @@ class PDB_reader:
                     self.amino_acids_number.append(amino_acid)    
                     self.more_stuff.append(extra)              
         pdb.close()
-    
+        seq = list(set(zip(self.amino_acids, self.amino_acids_number)))
+        seq.sort(key=lambda tup: tup[1])
+        for aa in seq:
+            self.sequence.append(aa[0])
+        
     def get_atoms(self):
         return copy.deepcopy(self.atoms)
        
@@ -364,16 +368,16 @@ class PDB_reader:
         n  = self.get_N_info()
         c  = self.get_C_info()       
         for aa in xrange(len(ca)):
-            if aa < len(ca) - 1:
-                name       = ca[aa][1]
-                ca_pos     = ca[aa][2]
-                c_pos      =  c[aa][2]                
-                nex_n_pos  =  n[aa+1][2]
-                nex_ca_pos = ca[aa+1][2]
-                omega = self.calc_angles(ca_pos, c_pos, nex_n_pos, nex_ca_pos)
+            if aa > 0:
+                name    = ca[aa][1]
+                pca_pos = ca[aa-1][2]
+                pc_pos  =  c[aa-1][2]                
+                n_pos   =  n[aa][2]
+                ca_pos  = ca[aa][2]
+                omega   = self.calc_angles(pca_pos, pc_pos, n_pos, ca_pos)
                 angles.append(omega)
             else:
-                angles.append(2.0*math.pi)
+                angles.append(2.0*math.pi)    
         return angles        
 
     def get_angles(self):
@@ -407,22 +411,22 @@ class PDB_reader:
         if len(angles) == 0:
             angles = [math.pi]*n_aa
         for i in xrange(n_aa):
-            if i + min(self.amino_acids_number) < max(self.amino_acids_number):
+            if i > 0:
                 #ROTATE OMEGA
+                pca_i  = zip(self.atoms, self.amino_acids_number).index(("CA",  i-1 + min(self.amino_acids_number))) #CA from aminoacid i-1
+                pc_i   = zip(self.atoms, self.amino_acids_number).index(("C",   i-1 + min(self.amino_acids_number))) #C from aminoacid i-1
+                n_i    = zip(self.atoms, self.amino_acids_number).index(("N",   i + min(self.amino_acids_number))) #N from aminoacid i
                 ca_i   = zip(self.atoms, self.amino_acids_number).index(("CA",  i + min(self.amino_acids_number))) #CA from aminoacid i
-                c_i    = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number))) #C from aminoacid i
-                nn_i   = zip(self.atoms, self.amino_acids_number).index(("N", i + 1 + min(self.amino_acids_number))) #N from aminoacid i+1
-                nca_i  = zip(self.atoms, self.amino_acids_number).index(("CA", i + 1 + min(self.amino_acids_number))) #CA from aminoacid i+1
-                ca_pos  = self.atoms_pos[ca_i]
-                c_pos   = self.atoms_pos[c_i]
-                nn_pos  = self.atoms_pos[nn_i]
-                nca_pos = self.atoms_pos[nca_i]
-                current_omega = self.calc_angles(ca_pos, c_pos, nn_pos, nca_pos)
+                pca_pos = self.atoms_pos[ca_i]
+                pc_pos  = self.atoms_pos[c_i]
+                n_pos   = self.atoms_pos[nn_i]
+                ca_pos  = self.atoms_pos[nca_i]
+                current_omega = self.calc_angles(pca_pos, pc_pos, n_pos, ca_pos)
                 domega = math.atan2(math.sin(angles[i] - current_omega), math.cos(angles[i] - current_omega))
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
-                    if (atom[1] > i + 1 + min(self.amino_acids_number) or (atom[1] == i + 1 + min(self.amino_acids_number) and (atom[0] != "N"))): 
-                        self.atoms_pos[ia] = self.rotate_atom_around_bond(domega, self.atoms_pos[ia], c_pos, nn_pos)
+                    if (atom[1] > i+1 + min(self.amino_acids_number) or (atom[1] == i+1 + min(self.amino_acids_number) and (atom[0] != "N"))): 
+                        self.atoms_pos[ia] = self.rotate_atom_around_bond(domega, self.atoms_pos[ia], pc_pos, n_pos)
                     ia += 1   
         
     def rotate_to(self, angles):
@@ -455,7 +459,6 @@ class PDB_reader:
                 ca_pos = self.atoms_pos[ca_i]
                 c_pos  = self.atoms_pos[c_i]
                 nn_pos = self.atoms_pos[nn_i] 
-                #current_angles = self.get_angles()
                 current_angle = self.calc_angles(n_pos, ca_pos, c_pos, nn_pos)                
                 dpsi = math.atan2(math.sin(angles[2*i+1] - current_angle), math.cos(angles[2*i+1] - current_angle))              
                 ia = 0
