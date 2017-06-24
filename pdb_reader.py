@@ -28,11 +28,9 @@ class PDB_reader:
         self.amino_acids_number = []
         self.more_stuff = []
         self.read_pdb()
-
-
-#line = "{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {:>2s}{:2s}".format(self.ATOM_TAG, i+1, self.atoms[i], " ", self.amino_acids[i], " ", self.amino_acids_number[i], " ", self.atoms_pos[i][0], self.atoms_pos[i][1], self.atoms_pos[i][2], self.more_stuff[i][0], self.more_stuff[i][1], " ", " ")
         
     def read_pdb(self):
+    #https://www.cgl.ucsf.edu/chimera/docs/UsersGuide/tutorials/pdbintro.html
         stop = False
         pdb = open(self.file_name, "r")       
         while not stop:
@@ -134,92 +132,34 @@ class PDB_reader:
         aux_aa = []
         aux_aan = []
         aux_ms = []
-        for a in xrange(len(ref_atoms)):  
-            #print(ref_atoms[a], ref_amino_acids[a])  
+        for a in xrange(len(ref_atoms)):
+            i = -1    
             if ref_atoms[a] == None:
                 pass   
             elif (ref_atoms[a], ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                 i = zip(self.atoms, self.amino_acids_number).index((ref_atoms[a], ref_amino_acids[a]))
-                aux_atoms.append(self.atoms.pop(i))
-                aux_atomsf.append(self.atoms_full.pop(i))
-                aux_pos.append(self.atoms_pos.pop(i))
-                aux_aa.append(self.amino_acids_number.pop(i))
-                aux_aan.append(self.amino_acids.pop(i))
-                aux_ms.append(self.more_stuff.pop(i))
             elif (ref_atoms[a][1:]+ref_atoms[a][0], ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                 i = zip(self.atoms, self.amino_acids_number).index((ref_atoms[a][1:]+ref_atoms[a][0], ref_amino_acids[a]))
-                aux_atoms.append(self.atoms.pop(i))
-                aux_atomsf.append(self.atoms_full.pop(i))
-                aux_pos.append(self.atoms_pos.pop(i))
-                aux_aa.append(self.amino_acids_number.pop(i))
-                aux_aan.append(self.amino_acids.pop(i))
-                aux_ms.append(self.more_stuff.pop(i))
             elif (ref_atoms[a][-1]+ref_atoms[a][0:-1], ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                 i = zip(self.atoms, self.amino_acids_number).index((ref_atoms[a][-1]+ref_atoms[a][0:-1], ref_amino_acids[a]))
-                aux_atoms.append(self.atoms.pop(i))
-                aux_atomsf.append(self.atoms_full.pop(i))
-                aux_pos.append(self.atoms_pos.pop(i))
-                aux_aa.append(self.amino_acids_number.pop(i))
-                aux_aan.append(self.amino_acids.pop(i))
-                aux_ms.append(self.more_stuff.pop(i))
             elif (ref_atoms[a] == "OXT" and ("OC", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
                     i = zip(self.atoms, self.amino_acids_number).index(("OC", ref_amino_acids[a]))
-                    aux_atoms.append(self.atoms.pop(i))
-                    aux_atomsf.append(self.atoms_full.pop(i))
-                    aux_pos.append(self.atoms_pos.pop(i))
-                    aux_aa.append(self.amino_acids_number.pop(i))
-                    aux_aan.append(self.amino_acids.pop(i))
-                    aux_ms.append(self.more_stuff.pop(i))
             elif (ref_atoms[a] == "OC" and ("OXT", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
                     i = zip(self.atoms, self.amino_acids_number).index(("OXT", ref_amino_acids[a]))
-                    aux_atoms.append(self.atoms.pop(i))
-                    aux_atomsf.append(self.atoms_full.pop(i))
-                    aux_pos.append(self.atoms_pos.pop(i))
-                    aux_aa.append(self.amino_acids_number.pop(i))
-                    aux_aan.append(self.amino_acids.pop(i))
-                    aux_ms.append(self.more_stuff.pop(i))
             elif (ref_atoms[a] == "H" and ("1H", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
                     i = zip(self.atoms, self.amino_acids_number).index(("1H", ref_amino_acids[a]))
-                    aux_atoms.append(self.atoms.pop(i))
-                    aux_atomsf.append(self.atoms_full.pop(i))
-                    aux_pos.append(self.atoms_pos.pop(i))
-                    aux_aa.append(self.amino_acids_number.pop(i))
-                    aux_aan.append(self.amino_acids.pop(i))
-                    aux_ms.append(self.more_stuff.pop(i))
             elif (ref_atoms[a] == "1H" and ("H", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
                     i = zip(self.atoms, self.amino_acids_number).index(("H", ref_amino_acids[a]))
-                    aux_atoms.append(self.atoms.pop(i))
-                    aux_atomsf.append(self.atoms_full.pop(i))
-                    aux_pos.append(self.atoms_pos.pop(i))
-                    aux_aa.append(self.amino_acids_number.pop(i))
-                    aux_aan.append(self.amino_acids.pop(i))
-                    aux_ms.append(self.more_stuff.pop(i))
             elif (len(ref_atoms[a]) == 3 and "H" in ref_atoms[a] and "3" in ref_atoms[a]):
                 ra = ref_atoms[a].replace("3", "1")
                 ra = ra[-1]+ra[0:-1]
-                #print("Changing: ")
-                #print(ref_atoms[a], ra)
                 if (ra, ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                     i = zip(self.atoms, self.amino_acids_number).index((ra, ref_amino_acids[a]))
-                    aux_atoms.append(self.atoms.pop(i))
-                    aux_atomsf.append(self.atoms_full.pop(i))
-                    aux_pos.append(self.atoms_pos.pop(i))
-                    aux_aa.append(self.amino_acids_number.pop(i))
-                    aux_aan.append(self.amino_acids.pop(i))
-                    aux_ms.append(self.more_stuff.pop(i))
             elif (len(ref_atoms[a]) == 3 and "H" in ref_atoms[a] and "1" in ref_atoms[a]):
                 ra = ref_atoms[a].replace("1", "3")
                 ra = ra[1:]+ra[0]
-                #print("Changing: ")
-                #print(ref_atoms[a], ra)
                 if (ra, ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                     i = zip(self.atoms, self.amino_acids_number).index((ra, ref_amino_acids[a]))
-                    aux_atoms.append(self.atoms.pop(i))
-                    aux_atomsf.append(self.atoms_full.pop(i))
-                    aux_pos.append(self.atoms_pos.pop(i))
-                    aux_aa.append(self.amino_acids_number.pop(i))
-                    aux_aan.append(self.amino_acids.pop(i))
-                    aux_ms.append(self.more_stuff.pop(i))
             else:
                 aux_atoms.append(None)
                 aux_atomsf.append(None)
@@ -227,9 +167,13 @@ class PDB_reader:
                 aux_aa.append(None)
                 aux_aan.append(None)
                 aux_ms.append(None)
-                #print("Not found: ")
-                #print(ref_atoms[a], ref_amino_acids[a])
-        #print(zip(self.atoms, self.amino_acids_number))
+            if i >= 0:
+                aux_atoms.append(self.atoms.pop(i))
+                aux_atomsf.append(self.atoms_full.pop(i))
+                aux_pos.append(self.atoms_pos.pop(i))
+                aux_aa.append(self.amino_acids_number.pop(i))
+                aux_aan.append(self.amino_acids.pop(i))
+                aux_ms.append(self.more_stuff.pop(i))                
         self.atoms = copy.deepcopy(aux_atoms)
         self.atoms_full = copy.deepcopy(aux_atomsf)
         self.atoms_pos = copy.deepcopy(aux_pos)
@@ -244,6 +188,14 @@ class PDB_reader:
         self.amino_acids_number = [x for x in self.amino_acids_number if x is not None]  
         self.amino_acids = [x for x in self.amino_acids if x is not None]  
         self.more_stuff = [x for x in self.more_stuff if x is not None]
+
+    def angle_diff(self, angle_source, angle_target):
+        a = angle_target - angle_source
+        if a > math.pi:
+            a -= math.pi * 2.0
+        if a < -math.pi:
+            a += math.pi * 2.0
+        return a
         
     def calc_angle_3(self, pos1, posC, pos2):
         #https://stackoverflow.com/questions/19729831/angle-between-3-points-in-3d-space
@@ -284,7 +236,6 @@ class PDB_reader:
         x = np.inner(normal1, normal2)
         y = np.inner(m1, normal2)
         angle = math.atan2(y, x)
-        #angle = np.degrees(angle)
         return -angle
 
     def get_peptide_bond_angles(self):
@@ -344,9 +295,11 @@ class PDB_reader:
                 if nh_i >= 0:
                     nh_pos  = self.atoms_pos[nh_i]
                     current_alphaH = self.calc_angle_3(c_pos, nn_pos, nh_pos)
-                    dalphaH = math.atan2(math.sin(angles[i] - current_alphaH), math.cos(angles[i] - current_alphaH)) 
+                    #dalphaH = math.atan2(math.sin(angles[i] - current_alphaH), math.cos(angles[i] - current_alphaH)) 
+                    dalphaH = self.angle_diff(current_alphaH, angles[i])
                 current_alpha = self.calc_angle_3(c_pos, nn_pos, nca_pos)
-                dalpha = math.atan2(math.sin(angles[i] - current_alpha), math.cos(angles[i] - current_alpha))
+                #dalpha = math.atan2(math.sin(angles[i] - current_alpha), math.cos(angles[i] - current_alpha))
+                dalpha = self.angle_diff(current_alpha, angles[i])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
                     if (atom[1] > i + 1 + min(self.amino_acids_number) or (atom[1] == i + 1 + min(self.amino_acids_number) and (atom[0] not in self.NH_ATOMS))): 
@@ -364,15 +317,12 @@ class PDB_reader:
         bond1C = self.normalize(pos1)
         bond2C = self.normalize(pos2)
         ortho = self.normalize(np.cross(bond1C, bond2C))
-
         c = np.cos(theta)
         s = np.sin(theta)
         t = 1.0 - c
-
         rot = np.matrix([[c + ortho[0] * ortho[0] * t, ortho[0] * ortho[1] * t - ortho[2] * s, ortho[0] * ortho[2] * t + ortho[1] * s], 
                          [ortho[0] * ortho[1] * t + ortho[2] * s, c + ortho[1] * ortho[1] * t, ortho[1] * ortho[2] * t - ortho[0] * s],
-                         [ortho[2] * ortho[0] * t - ortho[1] * s, ortho[2] * ortho[1] * t + ortho[0] * s, c + ortho[2] * ortho[2] * t]])
-                         
+                         [ortho[2] * ortho[0] * t - ortho[1] * s, ortho[2] * ortho[1] * t + ortho[0] * s, c + ortho[2] * ortho[2] * t]])      
         new_pos = np.matrix.tolist(np.matrix(atom_pos) * rot.transpose())[0]               
         new_pos = list(np.array(new_pos) + posC)
         return new_pos
@@ -437,7 +387,8 @@ class PDB_reader:
                 n_pos   = self.atoms_pos[n_i]
                 ca_pos  = self.atoms_pos[ca_i]
                 current_omega = self.calc_angles(pca_pos, pc_pos, n_pos, ca_pos)
-                domega = math.atan2(math.sin(angles[i] - current_omega), math.cos(angles[i] - current_omega))
+                #domega = math.atan2(math.sin(angles[i] - current_omega), math.cos(angles[i] - current_omega))
+                domega = self.angle_diff(current_omega, angles[i])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
                     if (atom[1] > i+1 + min(self.amino_acids_number) or (atom[1] == i+1 + min(self.amino_acids_number) and (atom[0] != "N"))): 
@@ -458,7 +409,8 @@ class PDB_reader:
                 ca_pos = self.atoms_pos[ca_i]
                 c_pos  = self.atoms_pos[c_i] 
                 current_angle = self.calc_angles(pc_pos, n_pos, ca_pos, c_pos)
-                dphi = math.atan2(math.sin(angles[2*i] - current_angle), math.cos(angles[2*i] - current_angle))    
+                #dphi = math.atan2(math.sin(angles[2*i] - current_angle), math.cos(angles[2*i] - current_angle))    
+                dphi = self.angle_diff(current_angle, angles[2*i])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
                     if (atom[1] > i + min(self.amino_acids_number) or (atom[1] == i + min(self.amino_acids_number) and (atom[0] not in self.NHC_ATOMS))): 
@@ -475,7 +427,8 @@ class PDB_reader:
                 c_pos  = self.atoms_pos[c_i]
                 nn_pos = self.atoms_pos[nn_i] 
                 current_angle = self.calc_angles(n_pos, ca_pos, c_pos, nn_pos)                
-                dpsi = math.atan2(math.sin(angles[2*i+1] - current_angle), math.cos(angles[2*i+1] - current_angle))              
+                #dpsi = math.atan2(math.sin(angles[2*i+1] - current_angle), math.cos(angles[2*i+1] - current_angle))              
+                dpsi = self.angle_diff(current_angle, angles[2*i+1])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
                     if (atom[1] > i+min(self.amino_acids_number) or (atom[1] == i+min(self.amino_acids_number) and (atom[0]=="O"))): 
@@ -495,13 +448,6 @@ class PDB_reader:
         k = self.normalize(k)
         rot_pos = v * np.cos(theta) + (np.cross(k, v)) * np.sin(theta) + k * (np.dot(k,v)) * (1.0 - np.cos(theta))
         return list(rot_pos + np.array(bond_start))
-        
-    def is_number(self, s):
-        try:
-            int(s)
-            return True
-        except ValueError:
-            return False
                 
     def write_pdb(self, file_name):
         pdb = open(file_name, "w")
@@ -511,6 +457,4 @@ class PDB_reader:
             pdb.write(line)
         pdb.write(self.END_TAG)
         pdb.close()                
-                
-       
-    
+                  

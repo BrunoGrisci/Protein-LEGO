@@ -10,7 +10,7 @@ def write_pdb(file_name, amino_acids):
     pdb = open(file_name, "w")
     for aa in amino_acids:
         for atom in aa.get_atoms():
-            line = "{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {:>2s}{:2s}".format(atom[0], atom[1], atom[2], " ", atom[3], " ", atom[4], " ", atom[5], atom[6], atom[7], atom[8], atom[9], " ", " ")
+            line = "{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {:>2s}{:2s}".format(atom[0], atom[1], atom[10], " ", atom[3], " ", atom[4], " ", atom[5], atom[6], atom[7], atom[8], atom[9], " ", " ")
             line = line + "\n"
             pdb.write(line)
     pdb.write("TER")
@@ -86,4 +86,4 @@ for aa in amino_acids:
     for atom in aa.get_atoms():
         print(atom)
 
-write_pdb(aa_sequence + ".pdb", amino_acids)
+write_pdb("data/" + aa_sequence + ".pdb", amino_acids)

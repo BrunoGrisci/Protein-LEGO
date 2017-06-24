@@ -22,8 +22,6 @@ print(c)
 
 print(len(ca), len(n), len(c))
 
-print(pdb.atoms_full)
-
 angles = pdb.get_angles()
 for a in xrange(0, naa*2, 2):
     print(round(math.degrees(angles[a]),2), round(math.degrees(angles[a+1]),2))
@@ -82,6 +80,7 @@ for a in pdb.get_omegas():
     print(round(math.degrees(a),2))
 
 print("########")
+print("PHI-PSI")
 angles = pdb.get_angles()
 for a in xrange(0, naa*2, 2):
     print(round(math.degrees(angles[a]),2), round(math.degrees(angles[a+1]),2))
@@ -89,4 +88,4 @@ for a in xrange(0, naa*2, 2):
 print("example end")
 print(len(pdb.get_all_pos()))
 
-pdb.write_pdb("test.pdb")
+pdb.write_pdb("data/test.pdb")
