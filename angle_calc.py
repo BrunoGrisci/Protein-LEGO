@@ -22,7 +22,10 @@ omegas = pdb.get_omegas()
 angle_file = open(pdb_file.replace('.pdb', '_angles.txt'), 'w')
 
 for a in xrange(len(names)):
-    line = "{:3s}  {:7.2f}  {:7.2f}  {:7.2f}".format(names[a], math.degrees(phis[a]), math.degrees(psis[a]), math.degrees(omegas[a]))
+    phis[a]   = math.degrees(phis[a])
+    psis[a]   = math.degrees(psis[a])
+    omegas[a] = math.degrees(omegas[a])
+    line = "{:3s}  {:7.2f}  {:7.2f}  {:7.2f}".format(names[a], phis[a], psis[a], omegas[a])
     print(line)
     angle_file.write(line + '\n')
     
