@@ -391,7 +391,7 @@ class PDB_reader:
                 domega = self.angle_diff(current_omega, angles[i])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
-                    if (atom[1] > i+1 + min(self.amino_acids_number) or (atom[1] == i+1 + min(self.amino_acids_number) and (atom[0] != "N"))): 
+                    if (atom[1] > i + min(self.amino_acids_number) or (atom[1] == i + min(self.amino_acids_number) and (atom[0] != "N"))): 
                         self.atoms_pos[ia] = self.rotate_atom_around_bond(domega, self.atoms_pos[ia], pc_pos, n_pos)
                     ia += 1   
         
