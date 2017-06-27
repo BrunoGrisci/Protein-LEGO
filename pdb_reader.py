@@ -280,15 +280,15 @@ class PDB_reader:
             if i + min(self.amino_acids_number) < max(self.amino_acids_number):
                 #ROTATE ALPHA
                 c_i   = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))     # C from aminoacid i
-                nn_i  = zip(self.atoms, self.amino_acids_number).index(("N",  i + 1 + min(self.amino_acids_number))) # N from aminoacid i+1
+                nn_i  = zip(self.atoms, self.amino_acids_number).index(("N",  i+1 + min(self.amino_acids_number))) # N from aminoacid i+1
                 nh_i  = -1.0
                 for a in self.NH_ATOMS:
                     if a != "N":                                                 
-                        nh_i  = zip(self.atoms, self.amino_acids_number).index((a,  i + 1 + min(self.amino_acids_number))) if (a,  i + 1 + min(self.amino_acids_number)) in zip(self.atoms, self.amino_acids_number) else -1
+                        nh_i  = zip(self.atoms, self.amino_acids_number).index((a,  i+1 + min(self.amino_acids_number))) if (a,  i+1 + min(self.amino_acids_number)) in zip(self.atoms, self.amino_acids_number) else -1
                         if nh_i >= 0:
                             break
                         
-                nca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i + 1 + min(self.amino_acids_number))) #CA from aminoacid i+1
+                nca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i+1 + min(self.amino_acids_number))) #CA from aminoacid i+1
                 c_pos   = self.atoms_pos[c_i]
                 nn_pos  = self.atoms_pos[nn_i]
                 nca_pos = self.atoms_pos[nca_i]
@@ -302,9 +302,9 @@ class PDB_reader:
                 dalpha = self.angle_diff(current_alpha, angles[i])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
-                    if (atom[1] > i + 1 + min(self.amino_acids_number) or (atom[1] == i + 1 + min(self.amino_acids_number) and (atom[0] not in self.NH_ATOMS))): 
+                    if (atom[1] > i+1 + min(self.amino_acids_number) or (atom[1] == i+1 + min(self.amino_acids_number) and (atom[0] not in self.NH_ATOMS))): 
                         self.atoms_pos[ia] = self.bend_bonds(dalpha, self.atoms_pos[ia], c_pos, nn_pos, nca_pos)
-                    elif nh_i >= 0 and atom[1] == i + 1 + min(self.amino_acids_number) and atom[0] in self.NH_ATOMS and atom[0] != "N":
+                    elif nh_i >= 0 and atom[1] == i+1 + min(self.amino_acids_number) and atom[0] in self.NH_ATOMS and atom[0] != "N":
                         self.atoms_pos[ia] = self.bend_bonds(dalphaH, self.atoms_pos[ia], c_pos, nn_pos, nh_pos)    
                     ia += 1                   
 

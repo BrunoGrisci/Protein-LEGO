@@ -280,7 +280,7 @@ class PDB_reader:
             if i + min(self.amino_acids_number) < max(self.amino_acids_number):
                 #ROTATE ALPHA
                 c_i   = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))     # C from aminoacid i
-                nn_i  = zip(self.atoms, self.amino_acids_number).index(("N",  i + 1 + min(self.amino_acids_number))) # N from aminoacid i+1
+                nn_i  = zip(self.atoms, self.amino_acids_number).index(("N",  i+1 + min(self.amino_acids_number))) # N from aminoacid i+1
                 nh_i  = -1.0
                 for a in self.NH_ATOMS:
                     if a != "N":                                                 
@@ -387,7 +387,6 @@ class PDB_reader:
                 n_pos   = self.atoms_pos[n_i]
                 ca_pos  = self.atoms_pos[ca_i]
                 current_omega = self.calc_angles(pca_pos, pc_pos, n_pos, ca_pos)
-                print(current_omega)
                 #domega = math.atan2(math.sin(angles[i] - current_omega), math.cos(angles[i] - current_omega))
                 domega = self.angle_diff(current_omega, angles[i])
                 ia = 0
