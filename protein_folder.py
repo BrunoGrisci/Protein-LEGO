@@ -24,7 +24,7 @@ def evaluator(solutions, pdb_ref, pdb_mob):
     scores = []
     for solution in solutions:
         pdb_mob.rotate_to([2.0*math.pi] + solution + [2.0*math.pi])
-        score = calc_exact_rmsd(pdb_ref.get_backbone_pos(), pdb_mob.get_backbone_pos())
+        score = calc_exact_rmsd(pdb_ref.get_all_pos(), pdb_mob.get_all_pos())
         scores.append(score)
     return scores
 
@@ -44,7 +44,7 @@ pdb_mob.set_peptide_bond_angles()
     
 pop_size = 200    
 dim = 2 * pdb_ref.get_number_amino_acids() - 2
-min_iterations = 400
+min_iterations = 300
 
 start_time = time.time()
 

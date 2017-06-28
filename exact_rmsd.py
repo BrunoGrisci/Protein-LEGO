@@ -24,17 +24,17 @@ atoms_type = sys.argv[3]
 pdb_ref = PDB_reader(reference_file)
 pdb_mob = PDB_reader(mobile_file)
 
-print(len(pdb_ref.get_atoms()), len(pdb_mob.get_atoms()))
+#print(len(pdb_ref.get_atoms()), len(pdb_mob.get_atoms()))
 
 pdb_mob.match_atoms(pdb_ref.get_atoms(), pdb_ref.get_amino_acids_index())
 pdb_mob.remove_nones()
 pdb_ref.match_atoms(pdb_mob.get_atoms(), pdb_mob.get_amino_acids_index())
 pdb_ref.remove_nones()
 
-print(len(pdb_ref.get_atoms()), len(pdb_mob.get_atoms()))
+#print(len(pdb_ref.get_atoms()), len(pdb_mob.get_atoms()))
 
-for atom in zip(pdb_ref.get_atoms(), pdb_mob.get_atoms()):
-    print(atom)
+#for atom in zip(pdb_ref.get_atoms(), pdb_mob.get_atoms()):
+#    print(atom)
 
 RMSD = None
 if atoms_type == "all":

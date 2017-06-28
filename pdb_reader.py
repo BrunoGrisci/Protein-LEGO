@@ -183,7 +183,7 @@ class PDB_reader:
         
     def remove_nones(self):
         self.atoms = [x for x in self.atoms if x is not None]
-        self.atoms_full = [x for x in self.atoms if x is not None] 
+        self.atoms_full = [x for x in self.atoms_full if x is not None] 
         self.atoms_pos = [x for x in self.atoms_pos if x is not None] 
         self.amino_acids_number = [x for x in self.amino_acids_number if x is not None]  
         self.amino_acids = [x for x in self.amino_acids if x is not None]  
@@ -456,5 +456,7 @@ class PDB_reader:
             line = line + "\n"
             pdb.write(line)
         pdb.write(self.END_TAG)
-        pdb.close()                
+        pdb.close()            
+        print(self.atoms)
+        print(self.atoms_full)    
                   

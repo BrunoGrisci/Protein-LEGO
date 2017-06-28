@@ -65,10 +65,9 @@ for a in pdb.get_peptide_bond_angles():
 print("example start")
 print(len(pdb.get_all_pos()))
 
-#pdb.rotate_omegas()
-#pdb.set_peptide_bond_angles()
 pdb.rotate_omegas()
-#pdb.rotate_to(pis)
+pdb.set_peptide_bond_angles()
+pdb.rotate_to(pis)
 
 print("########")
 print("PEPTIDE BOND")
@@ -89,4 +88,11 @@ for a in xrange(0, naa*2, 2):
 print("example end")
 print(len(pdb.get_all_pos()))
 
+
+
+pdb_ref = PDB_reader("data/1PLX.pdb")
+pdb.match_atoms(pdb_ref.get_atoms(), pdb_ref.get_amino_acids_index())
+pdb.remove_nones()    
+pdb_ref.match_atoms(pdb.get_atoms(), pdb.get_amino_acids_index())
+pdb_ref.remove_nones()
 pdb.write_pdb("data/test.pdb")
