@@ -143,13 +143,13 @@ class PDB_reader:
             elif (ref_atoms[a][-1]+ref_atoms[a][0:-1], ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number):
                 i = zip(self.atoms, self.amino_acids_number).index((ref_atoms[a][-1]+ref_atoms[a][0:-1], ref_amino_acids[a]))
             elif (ref_atoms[a] == "OXT" and ("OC", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
-                    i = zip(self.atoms, self.amino_acids_number).index(("OC", ref_amino_acids[a]))
+                i = zip(self.atoms, self.amino_acids_number).index(("OC", ref_amino_acids[a]))
             elif (ref_atoms[a] == "OC" and ("OXT", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
-                    i = zip(self.atoms, self.amino_acids_number).index(("OXT", ref_amino_acids[a]))
+                i = zip(self.atoms, self.amino_acids_number).index(("OXT", ref_amino_acids[a]))
             elif (ref_atoms[a] == "H" and ("1H", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
-                    i = zip(self.atoms, self.amino_acids_number).index(("1H", ref_amino_acids[a]))
+                i = zip(self.atoms, self.amino_acids_number).index(("1H", ref_amino_acids[a]))
             elif (ref_atoms[a] == "1H" and ("H", ref_amino_acids[a]) in zip(self.atoms, self.amino_acids_number)):
-                    i = zip(self.atoms, self.amino_acids_number).index(("H", ref_amino_acids[a]))
+                i = zip(self.atoms, self.amino_acids_number).index(("H", ref_amino_acids[a]))
             elif (len(ref_atoms[a]) == 3 and "H" in ref_atoms[a] and "3" in ref_atoms[a]):
                 ra = ref_atoms[a].replace("3", "1")
                 ra = ra[-1]+ra[0:-1]
@@ -295,10 +295,8 @@ class PDB_reader:
                 if nh_i >= 0:
                     nh_pos  = self.atoms_pos[nh_i]
                     current_alphaH = self.calc_angle_3(c_pos, nn_pos, nh_pos)
-                    #dalphaH = math.atan2(math.sin(angles[i] - current_alphaH), math.cos(angles[i] - current_alphaH)) 
                     dalphaH = self.angle_diff(current_alphaH, angles[i])
                 current_alpha = self.calc_angle_3(c_pos, nn_pos, nca_pos)
-                #dalpha = math.atan2(math.sin(angles[i] - current_alpha), math.cos(angles[i] - current_alpha))
                 dalpha = self.angle_diff(current_alpha, angles[i])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
@@ -387,7 +385,6 @@ class PDB_reader:
                 n_pos   = self.atoms_pos[n_i]
                 ca_pos  = self.atoms_pos[ca_i]
                 current_omega = self.calc_angles(pca_pos, pc_pos, n_pos, ca_pos)
-                #domega = math.atan2(math.sin(angles[i] - current_omega), math.cos(angles[i] - current_omega))
                 domega = self.angle_diff(current_omega, angles[i])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
@@ -408,8 +405,7 @@ class PDB_reader:
                 n_pos  = self.atoms_pos[n_i]
                 ca_pos = self.atoms_pos[ca_i]
                 c_pos  = self.atoms_pos[c_i] 
-                current_angle = self.calc_angles(pc_pos, n_pos, ca_pos, c_pos)
-                #dphi = math.atan2(math.sin(angles[2*i] - current_angle), math.cos(angles[2*i] - current_angle))    
+                current_angle = self.calc_angles(pc_pos, n_pos, ca_pos, c_pos)   
                 dphi = self.angle_diff(current_angle, angles[2*i])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
@@ -426,8 +422,7 @@ class PDB_reader:
                 ca_pos = self.atoms_pos[ca_i]
                 c_pos  = self.atoms_pos[c_i]
                 nn_pos = self.atoms_pos[nn_i] 
-                current_angle = self.calc_angles(n_pos, ca_pos, c_pos, nn_pos)                
-                #dpsi = math.atan2(math.sin(angles[2*i+1] - current_angle), math.cos(angles[2*i+1] - current_angle))              
+                current_angle = self.calc_angles(n_pos, ca_pos, c_pos, nn_pos)                            
                 dpsi = self.angle_diff(current_angle, angles[2*i+1])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
