@@ -2,59 +2,75 @@
 #JUNE/2017
 
 import sys
+import pprint 
 
 class Force_field():
-
+    #ffbonded
+    BONDTYPES = {'I':   0,
+                 'J':   1,
+                 'FUNC':2,
+                 'B0':  3,
+                 'KB':  4}
+    CONSTRAINTTYPES = {}             
+    ANGLETYPES = {'I':    0,
+                  'J':    1,
+                  'K':    2,
+                  'FUNC': 3,
+                  'TH0':  4,
+                  'CTH':  5}
+    DIHEDRALTYPES = {'I':    0,
+                     'J':    1,
+                     'K':    2,
+                     'L':    3,
+                     'FUNC': 4,
+                     'PHASE':5,
+                     'KD':   6,
+                     'PN':   7}
+    ##ffnonbonded             
+    ATOMTYPES = {'NAME':   0,
+                 'ATNUM':  1,
+                 'MASS':   2,
+                 'CHARGE': 3,
+                 'PTYPE':  4,
+                 'SIGMA':  5,
+                 'EPSILON':6}
+                 
     def __init__(self, file_bonds, file_nonbonds, file_aminoacids):
-        self.file_bonds = file_bonds
-        self.file_nonbonds = file_nonbonds
-        self.file_aminoacids = file_aminoacids
-        self.BONDED = {}
-        self.NONBONDED = {}
-        self.AMINOACIDS = {}
-        
-        self.read_bonds()
-        self.read_nonbonds()
-        self.read_aminoacids()
-        
-    def read_bonds(self):
-        fbonds = open(self.file_bonds, 'r')                    
-        fbonds.close()
-        
-    def read_nonbonds(self):
-        fnonbonds = open(self.file_nonbonds, 'r')
-        fnonbonds.close()
-        
-    def read_aminoacids(self):
-        faminoacids = open(self.file_aminoacids, 'r')
+        self.BONDED = self.read_file(file_bonds)
+        self.NONBONDED = self.read_file(file_nonbonds)
+        self.AMINOACIDS = self.read_file(file_aminoacids)
+        pp = pprint.PrettyPrinter(indent=2)
+        pp.pprint(self.AMINOACIDS)
+                        
+    def read_file(self, file_name):
+        dic = {}
         key = ''
-        subkey = ''
-        for original_line in faminoacids:
+        subkey = ''        
+        f = open(file_name, 'r')
+        for original_line in f:
             if original_line[0] != ';' and original_line.strip() and original_line not in ['\n', '\r\n']:
                     if ' [' in original_line:
                         subkey = original_line[original_line.find('[')+1:original_line.find(']')].replace(' ', '')
-                        if self.AMINOACIDS[key] == []:
-                            self.AMINOACIDS[key] = {}
-                        self.AMINOACIDS[key][subkey] = []
+                        if dic[key] == []:
+                            dic[key] = {}
+                        dic[key][subkey] = []
                     elif '[' in original_line:
                         key = original_line[original_line.find('[')+1:original_line.find(']')].replace(' ', '')
                         subkey = ''
-                        self.AMINOACIDS[key] = []                    
+                        dic[key] = []                    
                     else:
                         if subkey != '':
-                            self.AMINOACIDS[key][subkey].append(map(self.to_number, original_line.split()))
+                            info = original_line.split(';')[0]
+                            dic[key][subkey].append(map(self.to_number, info.split()))
                         else:
-                            self.AMINOACIDS[key].append(map(self.to_number, original_line.split()))
-        
-        for k in self.AMINOACIDS:
-            for kk in self.AMINOACIDS[k]:
-                print(k, kk)
-        faminoacids.close()
+                            info = original_line.split(';')[0]
+                            dic[key].append(map(self.to_number, info.split()))
+        f.close()
+        return dic
         
     def to_number(self, n):
         try:
             float(n)
             return float(n)
         except ValueError:
-            return n
-        
+            return n        
