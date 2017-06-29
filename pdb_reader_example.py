@@ -65,8 +65,9 @@ for a in pdb.get_peptide_bond_angles():
 print("example start")
 print(len(pdb.get_all_pos()))
 
-pdb.rotate_omegas()
 pdb.set_peptide_bond_angles()
+pdb.set_NH_angles()
+pdb.rotate_omegas()
 pdb.rotate_to(pis)
 
 print("########")

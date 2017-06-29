@@ -10,3 +10,6 @@ nonbonded_file = sys.argv[2]
 aminoacids_file = sys.argv[3]
 
 ff = Force_field(bonded_file, nonbonded_file, aminoacids_file)
+
+for b in ff.BONDED:
+    print(b[ff.BONDTYPES['I']])

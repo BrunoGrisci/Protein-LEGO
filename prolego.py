@@ -91,8 +91,8 @@ for aa in amino_acids:
 write_pdb("data/" + aa_sequence + ".pdb", amino_acids)
 
 pdb = PDB_reader("data/" + aa_sequence + ".pdb")
-
 pdb.set_peptide_bond_angles()
+pdb.set_NH_angles()
 pdb.rotate_omegas()
 pis = [math.radians(180.0)]*(len(aa_sequence)*2)
 pdb.rotate_to(pis)

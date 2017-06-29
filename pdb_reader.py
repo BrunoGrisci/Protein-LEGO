@@ -279,16 +279,36 @@ class PDB_reader:
         for i in xrange(n_aa):
             if i + min(self.amino_acids_number) < max(self.amino_acids_number):
                 #ROTATE ALPHA
-                c_i   = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))     # C from aminoacid i
+                c_i   = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))   # C from aminoacid i
                 nn_i  = zip(self.atoms, self.amino_acids_number).index(("N",  i+1 + min(self.amino_acids_number))) # N from aminoacid i+1
+                nca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i+1 + min(self.amino_acids_number))) #CA from aminoacid i+1                                   
+                c_pos   = self.atoms_pos[c_i]
+                nn_pos  = self.atoms_pos[nn_i]
+                nca_pos = self.atoms_pos[nca_i]
+                current_alpha = self.calc_angle_3(c_pos, nn_pos, nca_pos)
+                dalpha = self.angle_diff(current_alpha, angles[i])
+                ia = 0
+                for atom in zip(self.atoms, self.amino_acids_number):
+                    if (atom[1] > i+1 + min(self.amino_acids_number) or (atom[1] == i+1 + min(self.amino_acids_number) and (atom[0] not in self.NH_ATOMS))): 
+                        self.atoms_pos[ia] = self.bend_bonds(dalpha, self.atoms_pos[ia], c_pos, nn_pos, nca_pos)  
+                    ia += 1                   
+
+    def set_NH_angles(self, angles=[]):
+        n_aa = self.get_number_amino_acids()
+        if len(angles) == 0:
+            angles = [math.radians(120.0)]*n_aa
+        for i in xrange(n_aa):
+            if i + min(self.amino_acids_number) < max(self.amino_acids_number):
+                #ROTATE ALPHA
+                c_i   = zip(self.atoms, self.amino_acids_number).index(("C",  i + min(self.amino_acids_number)))   # C from aminoacid i
+                nn_i  = zip(self.atoms, self.amino_acids_number).index(("N",  i+1 + min(self.amino_acids_number))) # N from aminoacid i+1
+                nca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i+1 + min(self.amino_acids_number))) #CA from aminoacid i+1
                 nh_i  = -1.0
                 for a in self.NH_ATOMS:
                     if a != "N":                                                 
-                        nh_i  = zip(self.atoms, self.amino_acids_number).index((a,  i+1 + min(self.amino_acids_number))) if (a,  i+1 + min(self.amino_acids_number)) in zip(self.atoms, self.amino_acids_number) else -1
+                        nh_i = zip(self.atoms, self.amino_acids_number).index((a, i+1+min(self.amino_acids_number))) if (a, i+1+min(self.amino_acids_number)) in zip(self.atoms, self.amino_acids_number) else -1
                         if nh_i >= 0:
-                            break
-                        
-                nca_i = zip(self.atoms, self.amino_acids_number).index(("CA", i+1 + min(self.amino_acids_number))) #CA from aminoacid i+1
+                            break                                   
                 c_pos   = self.atoms_pos[c_i]
                 nn_pos  = self.atoms_pos[nn_i]
                 nca_pos = self.atoms_pos[nca_i]
@@ -296,15 +316,18 @@ class PDB_reader:
                     nh_pos  = self.atoms_pos[nh_i]
                     current_alphaH = self.calc_angle_3(c_pos, nn_pos, nh_pos)
                     dalphaH = self.angle_diff(current_alphaH, angles[i])
-                current_alpha = self.calc_angle_3(c_pos, nn_pos, nca_pos)
-                dalpha = self.angle_diff(current_alpha, angles[i])
+                    if (current_alphaH < dalphaH):
+                        dalphaH = self.angle_diff(current_alphaH, -angles[i])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
-                    if (atom[1] > i+1 + min(self.amino_acids_number) or (atom[1] == i+1 + min(self.amino_acids_number) and (atom[0] not in self.NH_ATOMS))): 
-                        self.atoms_pos[ia] = self.bend_bonds(dalpha, self.atoms_pos[ia], c_pos, nn_pos, nca_pos)
-                    elif nh_i >= 0 and atom[1] == i+1 + min(self.amino_acids_number) and atom[0] in self.NH_ATOMS and atom[0] != "N":
-                        self.atoms_pos[ia] = self.bend_bonds(dalphaH, self.atoms_pos[ia], c_pos, nn_pos, nh_pos)    
-                    ia += 1                   
+                    if nh_i >= 0 and atom[1] == i+1 + min(self.amino_acids_number) and atom[0] in self.NH_ATOMS and atom[0] != "N":
+                        print(atom)
+                        print(math.degrees(current_alphaH))
+                        print(math.degrees(dalphaH))
+                        print(self.atoms_pos[ia])
+                        self.atoms_pos[ia] = self.bend_bonds(dalphaH, self.atoms_pos[ia], c_pos, nn_pos, nh_pos) 
+                        print(self.atoms_pos[ia])   
+                    ia += 1
 
     def bend_bonds(self, theta, atom_pos, pos1, posC, pos2):
         #https://pt.stackoverflow.com/questions/25923/vetores-e-%C3%82ngulos-geometria-molecular
@@ -451,7 +474,5 @@ class PDB_reader:
             line = line + "\n"
             pdb.write(line)
         pdb.write(self.END_TAG)
-        pdb.close()            
-        print(self.atoms)
-        print(self.atoms_full)    
+        pdb.close()               
                   
