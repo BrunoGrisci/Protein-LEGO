@@ -40,7 +40,7 @@ class Force_field():
         self.NONBONDED = self.read_file(file_nonbonds)
         self.AMINOACIDS = self.read_file(file_aminoacids)
         pp = pprint.PrettyPrinter(indent=2)
-        pp.pprint(self.AMINOACIDS)
+        pp.pprint(self.BONDED)
                         
     def read_file(self, file_name):
         dic = {}

@@ -287,6 +287,8 @@ class PDB_reader:
                 nca_pos = self.atoms_pos[nca_i]
                 current_alpha = self.calc_angle_3(c_pos, nn_pos, nca_pos)
                 dalpha = self.angle_diff(current_alpha, angles[i])
+                if (current_alpha < dalpha):
+                    dalpha = self.angle_diff(current_alpha, -angles[i])
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
                     if (atom[1] > i+1 + min(self.amino_acids_number) or (atom[1] == i+1 + min(self.amino_acids_number) and (atom[0] not in self.NH_ATOMS))): 
@@ -321,12 +323,7 @@ class PDB_reader:
                 ia = 0
                 for atom in zip(self.atoms, self.amino_acids_number):
                     if nh_i >= 0 and atom[1] == i+1 + min(self.amino_acids_number) and atom[0] in self.NH_ATOMS and atom[0] != "N":
-                        print(atom)
-                        print(math.degrees(current_alphaH))
-                        print(math.degrees(dalphaH))
-                        print(self.atoms_pos[ia])
-                        self.atoms_pos[ia] = self.bend_bonds(dalphaH, self.atoms_pos[ia], c_pos, nn_pos, nh_pos) 
-                        print(self.atoms_pos[ia])   
+                        self.atoms_pos[ia] = self.bend_bonds(dalphaH, self.atoms_pos[ia], c_pos, nn_pos, nh_pos)  
                     ia += 1
 
     def bend_bonds(self, theta, atom_pos, pos1, posC, pos2):
