@@ -120,27 +120,45 @@ class Force_field():
  
     def correct_atom_name(self, atom, amino_acid):
         for a in self.AMINOACIDS[amino_acid]['atoms']:
-            if atom == a[0]:
-                return atom
-            elif atom[1:] + atom[0]      == a[0]:
-                return atom[1:]+atom[0]
+            if atom == 'HOC':
+                return None
+            elif atom == a[0]:
+                return a[0]
+            elif len(atom) == 2 and 'H' in atom and amino_acid[0] == 'N' and atom[1:] + atom[0] == a[0]:
+                return a[0]                
+            elif len(atom) == 3 and atom[1:] + atom[0] == a[0]:
+                return a[0]
+            elif len(atom) == 4 and 'ILE' not in amino_acid and atom[1:] + atom[0] == a[0]:
+                return a[0]    
+            elif len(atom) == 4 and 'ILE' in amino_acid and 'HG' in atom and (atom[1:] + atom[0]).replace('13', '11') == a[0]:
+                return a[0]    
+            elif len(atom) == 4 and 'ILE' in amino_acid and 'HD' in atom and (atom[1:]+atom[0]).replace((atom[1:]+atom[0])[2:4], (atom[1:]+atom[0])[3]) == a[0]:
+                return a[0]                                       
+            elif len(atom) == 4 and atom[2:] + atom[0:2] == a[0]:
+                return a[0]
+            elif len(atom) == 4 and atom[0:2] == 'HG' and '13' in atom and 'ILE' in amino_acid and atom.replace('13', '11') == a[0]:
+                return a[0]
+            elif len(atom) == 4 and atom[0:2] == 'HD' and atom[2] == '1' and 'ILE' in amino_acid and atom.replace(atom[2:4], atom[3]) == a[0]:
+                return a[0]     
+            elif atom == 'CD1' and 'ILE' in amino_acid and 'CD' == a[0]:
+                return a[0]                         
             elif atom == 'OXT' and 'OC2' == a[0]:
-                return 'OC2'
+                return a[0]
             elif atom == 'OC'  and 'OC1' == a[0]:
-                return 'OC1'
+                return a[0]
             elif atom == 'O'  and 'OC1' == a[0]:
-                return 'OC1'                
+                return a[0]                
             elif atom == 'H'   and 'H1'  == a[0]:
-                return 'H1'
+                return a[0]
             elif atom == '1H'   and 'H'  == a[0]:
-                return 'H'                
+                return a[0]                
             elif (len(atom) == 3 and "H" in atom and "3" in atom):
                 ra = atom.replace("3", "1")                
                 if ra == a[0]:
-                    return ra
+                    return a[0]
                 else:
                     if ra[1:] + ra[0] == a[0]:
-                        return ra[1:] + ra[0]
+                        return a[0]
 
     def non_bonded(self):
         lj = 0.0
@@ -155,41 +173,42 @@ class Force_field():
         for i in xrange(len(atoms)):
             for j in xrange(len(atoms)):
                 if i > j:
-                    aai = amino_acids[i]
-                    aaj = amino_acids[j]
-                    if aa_index[i] == aa_0:
-                        aai = 'N' + aai
-                    if aa_index[j] == aa_0:
-                        aaj = 'N' + aaj
-                    if aa_index[i] == aa_N:
-                        aai = 'C' + aai
-                    if aa_index[j] == aa_N:
-                        aaj = 'C' + aaj                   
-                    atomi = self.correct_atom_name(atoms[i], aai)
-                    atomj = self.correct_atom_name(atoms[j], aaj)  
-                    if(atomi is None):
-                        print(atoms[i], atomi, aai)
-                    if(atomj is None):
-                        print(atoms[j], atomj, aaj)                                                                
-                    if not self.are_bonded(atomi, atomj, aai, aaj, aa_index[i], aa_index[j]) and atomi is not None and atomj is not None:  
-                        atomi_key = ''
-                        qi = 0.0    
-                        for a in self.AMINOACIDS[aai]['atoms']:
-                            if atomi == a[0]:
-                                atomi_key = a[1]
-                                qi = a[2]                                                   
-                        atomj_key = ''
-                        qj = 0.0
-                        for a in self.AMINOACIDS[aaj]['atoms']:
-                            if atomj == a[0]:
-                                atomj_key = a[1]
-                                qj = a[2] 
-                        if(atomj_key == ''):
-                            print(atoms[j], atomj, aaj)                                                                         
-                        rij  = math.sqrt((atoms_pos[i][0] - atoms_pos[j][0])**2 + (atoms_pos[i][1] - atoms_pos[j][1])**2 + (atoms_pos[i][2] - atoms_pos[j][2])**2)/10.0 #a to nm                         
-                        eps  = self.LJPARAMETERS[atomi_key][atomj_key]['epsilon']  
-                        rmin = self.LJPARAMETERS[atomi_key][atomj_key]['rmin']  
-                        lj      += eps * (math.pow(rmin/rij, 12.0) - 2.0 * math.pow(rmin/rij, 6.0)) 
-                        coulomb += (qi * qj) / (e1 * rij)
+                    if atoms[i] != 'HOC' and atoms[j] != 'HOC':
+                        aai = amino_acids[i]
+                        aaj = amino_acids[j]
+                        if aa_index[i] == aa_0:
+                            aai = 'N' + aai
+                        if aa_index[j] == aa_0:
+                            aaj = 'N' + aaj
+                        if aa_index[i] == aa_N:
+                            aai = 'C' + aai
+                        if aa_index[j] == aa_N:
+                            aaj = 'C' + aaj                   
+                        atomi = self.correct_atom_name(atoms[i], aai)
+                        atomj = self.correct_atom_name(atoms[j], aaj)  
+                        if(atomi is None):
+                            print(atoms[i], atomi, aai)
+                        if(atomj is None):
+                            print(atoms[j], atomj, aaj)                                                                
+                        if not self.are_bonded(atomi, atomj, aai, aaj, aa_index[i], aa_index[j]) and atomi is not None and atomj is not None:  
+                            atomi_key = ''
+                            qi = 0.0    
+                            for a in self.AMINOACIDS[aai]['atoms']:
+                                if atomi == a[0]:
+                                    atomi_key = a[1]
+                                    qi = a[2]                                                   
+                            atomj_key = ''
+                            qj = 0.0
+                            for a in self.AMINOACIDS[aaj]['atoms']:
+                                if atomj == a[0]:
+                                    atomj_key = a[1]
+                                    qj = a[2] 
+                            if(atomj_key == ''):
+                                print(atoms[j], atomj, aaj)                                                                         
+                            rij  = math.sqrt((atoms_pos[i][0] - atoms_pos[j][0])**2 + (atoms_pos[i][1] - atoms_pos[j][1])**2 + (atoms_pos[i][2] - atoms_pos[j][2])**2)                       
+                            eps  = self.LJPARAMETERS[atomi_key][atomj_key]['epsilon']  
+                            rmin = self.LJPARAMETERS[atomi_key][atomj_key]['rmin']  
+                            lj      += eps * (math.pow(rmin/rij, 12.0) - 2.0 * math.pow(rmin/rij, 6.0)) 
+                            coulomb += (qi * qj) / (e1 * rij)
         return lj + coulomb            
                        
