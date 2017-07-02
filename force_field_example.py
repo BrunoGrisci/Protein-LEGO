@@ -4,12 +4,13 @@
 import sys
 
 from force_field import Force_field
+from pdb_reader import PDB_reader
 
 bonded_file = sys.argv[1]
 nonbonded_file = sys.argv[2]
 aminoacids_file = sys.argv[3]
 
+pdb = PDB_reader('data/1PLX.pdb')
 ff = Force_field(bonded_file, nonbonded_file, aminoacids_file)
-    
-for b in ff.BONDED['bondtypes']:
-    print(b[ff.BONDTYPES['I']])
+ff.insert_PDB(pdb)
+print(ff.non_bonded())
