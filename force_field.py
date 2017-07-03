@@ -205,7 +205,7 @@ class Force_field():
                                     qj = a[2] 
                             if(atomj_key == ''):
                                 print(atoms[j], atomj, aaj)                                                                         
-                            rij  = math.sqrt((atoms_pos[i][0] - atoms_pos[j][0])**2 + (atoms_pos[i][1] - atoms_pos[j][1])**2 + (atoms_pos[i][2] - atoms_pos[j][2])**2)                       
+                            rij  = math.sqrt((atoms_pos[i][0] - atoms_pos[j][0])**2 + (atoms_pos[i][1] - atoms_pos[j][1])**2 + (atoms_pos[i][2] - atoms_pos[j][2])**2) / 10.0                       
                             eps  = self.LJPARAMETERS[atomi_key][atomj_key]['epsilon']  
                             rmin = self.LJPARAMETERS[atomi_key][atomj_key]['rmin']  
                             lj      += eps * (math.pow(rmin/rij, 12.0) - 2.0 * math.pow(rmin/rij, 6.0)) 
