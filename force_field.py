@@ -160,6 +160,18 @@ class Force_field():
                     if ra[1:] + ra[0] == a[0]:
                         return a[0]
 
+    def bonded(self):
+        dihedral = 0.0
+        atoms = self.PDB.get_atoms()
+        atoms_pos = self.PDB.get_all_pos()
+        amino_acids = self.PDB.get_amino_acids()
+        aa_index = self.PDB.get_amino_acids_index()
+        aa_0 = min(aa_index)
+        aa_N = max(aa_index)
+        PHI = ['C', 'CT', 'N', 'C']
+        PSI = ['N', 'CT', 'C', 'N']
+        OME = ['CT', 'C', 'N', 'CT']
+
     def non_bonded(self):
         lj = 0.0
         coulomb = 0.0
