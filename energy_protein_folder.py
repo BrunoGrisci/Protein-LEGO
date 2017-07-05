@@ -23,15 +23,12 @@ def calc_exact_rmsd(ref_atoms, mob_atoms):
 
 def evaluator(solutions, force_field, pdb_ref, pdb_mob):
     scores = []
-    rmsds  = [] 
     for solution in solutions:
         pdb_mob.rotate_to([2.0*math.pi] + solution + [2.0*math.pi])
         force_field.insert_PDB(pdb_mob)
         score = force_field.non_bonded()
-        rmsd = calc_exact_rmsd(pdb_ref.get_all_pos(), pdb_mob.get_all_pos())
         scores.append(score)
-        rmsds.append(rmsd)
-    return scores, rmsds
+    return scores
 
 reference_file = sys.argv[1]
 mobile_file = sys.argv[2]
@@ -52,9 +49,9 @@ pdb_ref.remove_nones()
 pdb_mob.rotate_omegas()
 pdb_mob.set_peptide_bond_angles()
     
-pop_size = 10
+pop_size = 20
 dim = 2 * pdb_ref.get_number_amino_acids() - 2
-min_iterations = 30
+min_iterations = 300
 
 start_time = time.time()
 
@@ -64,11 +61,13 @@ scores_over_time = []
 rmsds_over_time = []
 for i in xrange(min_iterations):
     locations = pso.get_locations()
-    scores, rmsds = evaluator(locations, ff, pdb_ref, pdb_mob)
+    scores = evaluator(locations, ff, pdb_ref, pdb_mob)
     pso.run_step(scores) 
     scores_over_time.append(pso.get_best_score())
-    rmsds_over_time.append(rmsds[scores.index(min(scores))])
-    print(pso.get_best_score(), rmsds[scores.index(min(scores))])
+    pdb_mob.rotate_to([2.0*math.pi] + pso.get_best_location() + [2.0*math.pi])
+    best_rmsd = calc_exact_rmsd(pdb_ref.get_all_pos(), pdb_mob.get_all_pos())
+    rmsds_over_time.append(best_rmsd)
+    print(pso.get_best_score(), best_rmsd)
 elapsed_time = time.time() - start_time
 print("Elapsed time: " + str(elapsed_time))
 print([2.0*math.pi] + pso.get_best_location() + [2.0*math.pi])
