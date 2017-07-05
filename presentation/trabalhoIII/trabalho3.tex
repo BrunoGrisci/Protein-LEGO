@@ -176,6 +176,9 @@ MET         & -74.24 x  -9.66 &  360.00 x  360.00 & -179.95 x  180.00
 \end{table}
 \end{frame}
 
+%------------------------------------------------
+\section{Criação da proteína} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+
 \begin{frame}
 \frametitle{Ferramentas}
 \begin{itemize}
@@ -185,9 +188,6 @@ MET         & -74.24 x  -9.66 &  360.00 x  360.00 & -179.95 x  180.00
 \item Trabalhos I e II.
 \end{itemize}
 \end{frame}
-
-%------------------------------------------------
-\section{Criação da proteína} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
 
 \begin{frame}
 \frametitle{1L2Y}
@@ -210,15 +210,73 @@ MET         & -74.24 x  -9.66 &  360.00 x  360.00 & -179.95 x  180.00
 %------------------------------------------------
 
 \begin{frame}
+\frametitle{Energia Potencial (AMBER99)}
+$E_{total} = $
+
+$\sum_{bonds} K_{b}(b - b_0)^2 + $
+
+$\sum_{UB} K_{UB}(S - S_0)^2 + $
+
+$\sum_{angle} K_{\theta}(\theta - \theta_0)^2 + $
+
+$\sum_{dihedrals} K_{\chi}(1 + cos(\eta - \delta)) + $
+
+$\sum_{impropers} K_{imp}(\varphi - \varphi_0)^2 + $
+
+$\color{red}\sum_{nonbond} \varepsilon [(\frac{R_{minij}}{r_{ij}})^{12} -2(\frac{R_{minij}}{r_{ij}})^6] + \frac{q_i q_j}{\varepsilon_1 r_{ij}} $
+\end{frame}
+
+\begin{frame}
+\frametitle{Termos não ligados}
+$\varepsilon = \sqrt{ \color{red} \varepsilon_i \varepsilon_j \color{black} }$
+
+$\color{red}\sigma_i \color{black} = R_{mini} \cdot 2^{-1/6}$
+
+$r_{ij} = \parallel P_i - P_j \parallel$
+
+$R_{minij} = \frac{R_{mini} + R_{minj}}{2}$
+
+$U^{LJ}_{ij} = \sqrt{ \color{red} \varepsilon_i \varepsilon_j \color{black} } [(\frac{R_{mini} + R_{minj}}{2r_{ij}})^{12} -2(\frac{R_{mini} + R_{minj}}{2r_{ij}})^{6}]$
+
+$\varepsilon_1 = 8.99 \cdot 10^9$
+
+$E_{nonbond} = \sum_{nonbond} \varepsilon [(\frac{R_{minij}}{r_{ij}})^{12} -2(\frac{R_{minij}}{r_{ij}})^6] + \frac{\color{red}q_i q_j \color{black}}{\varepsilon_1 r_{ij}}$
+\end{frame}
+
+\begin{frame}
 \frametitle{Otimização}
 Particle Swarm Optimization
 \begin{itemize}
   \item Minimização;
-  \item Função de avaliação: Energia Potencial (AMBER99);
+  \item Função de avaliação: $E_{nonbond}$ (AMBER99);
   \item Dimensões: $2 \times \parallel AA \parallel - 2$;
-  \item Limites: $0$;
-  \item População: $0$;
-  \item Iterações: $0$
+  \item Limites: $[-\pi, \pi]$;
+  \item População: $20$;
+  \item Iterações: $300$
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\section{Resultados} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Energia X RMSD}
+\begin{figure}
+\includegraphics[width=0.7\linewidth]{1L2Y-F_energy.png}
+\end{figure}
+Tempo: 1h 54min
+\end{frame}
+
+\begin{frame}
+\frametitle{1L2Y X 1L2Y-F}
+\begin{figure}
+\includegraphics[width=0.4\linewidth]{1L2Y-F.png}
+\end{figure}
+\begin{itemize}
+  \item $RMSD_{C_\alpha}: 6.17$
+  \item $RMSD_{backbone}: 5.80$
+  \item $RMSD_{all}: 7.45$ 
 \end{itemize}
 \end{frame}
 
