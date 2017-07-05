@@ -52,9 +52,9 @@ pdb_ref.remove_nones()
 pdb_mob.rotate_omegas()
 pdb_mob.set_peptide_bond_angles()
     
-pop_size = 10    
+pop_size = 10
 dim = 2 * pdb_ref.get_number_amino_acids() - 2
-min_iterations = 300
+min_iterations = 30
 
 start_time = time.time()
 
@@ -87,10 +87,17 @@ angles = pdb_mob.get_angles()
 for a in xrange(0, pdb_mob.get_number_amino_acids()*2, 2):
     print(round(math.degrees(angles[a]),2), round(math.degrees(angles[a+1]),2))
 
-plt.plot(scores_over_time)
-plt.title('Energy over iterations: ' + reference_file.replace(".pdb", "-F"))
-plt.xlabel('Iterations')
-plt.ylabel('Energy')
+
+fig, ax1 = plt.subplots()
+ax1.plot(scores_over_time, 'b-')
+ax1.set_title('Energy over iterations: ' + reference_file.replace(".pdb", "-F"))
+ax1.set_xlabel('Iterations')
+# Make the y-axis label, ticks and tick labels match the line color.
+ax1.set_ylabel('Energy', color='b')
+ax1.tick_params('y', colors='b')
+ax2 = ax1.twinx()
+ax2.plot(rmsds_over_time, 'r-')
+ax2.set_ylabel('RMSD', color='r')
+ax2.tick_params('y', colors='r')
 fig = plt.gcf()
-#fig.set_size_inches(10, 10)
 fig.savefig(reference_file.replace(".pdb", "-F_energy.png"), dpi=100, bbox_inches='tight') 
