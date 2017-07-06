@@ -53,9 +53,9 @@ ff.insert_PDB(pdb_ref)
 e_ref = ff.non_bonded()
 print('Reference energy: ' + str(e_ref))
     
-pop_size = 20
+pop_size = 60
 dim = 2 * pdb_ref.get_number_amino_acids() - 2
-min_iterations = 20
+min_iterations = 1000
 
 start_time = time.time()
 
@@ -71,36 +71,40 @@ for i in xrange(min_iterations):
     pdb_mob.rotate_to([2.0*math.pi] + pso.get_best_location() + [2.0*math.pi])
     best_rmsd = calc_exact_rmsd(pdb_ref.get_all_pos(), pdb_mob.get_all_pos())
     rmsds_over_time.append(best_rmsd)
-    print(pso.get_best_score(), best_rmsd, pso.get_best_score() - e_ref)
-elapsed_time = time.time() - start_time
-print("Elapsed time: " + str(elapsed_time))
-print([2.0*math.pi] + pso.get_best_location() + [2.0*math.pi])
-location_in_degrees = []
-for loc in [2.0*math.pi] + pso.get_best_location() + [2.0*math.pi]:
-    location_in_degrees.append(math.degrees(loc))
-print(location_in_degrees)
-print(pso.get_best_score())
+    print(i+1, pso.get_best_score(), best_rmsd, pso.get_best_score() - e_ref)
+    
+    if (i+1)%20 == 0:
+        print("###############" + str(i+1) + "##############")   
+        elapsed_time = time.time() - start_time
+        print("Elapsed time: " + str(elapsed_time))
+        print([2.0*math.pi] + pso.get_best_location() + [2.0*math.pi])
+        location_in_degrees = []
+        for loc in [2.0*math.pi] + pso.get_best_location() + [2.0*math.pi]:
+            location_in_degrees.append(math.degrees(loc))
+        print(location_in_degrees)
+        print(pso.get_best_score())
+           
+        pdb_mob.rotate_to([2.0*math.pi] + pso.get_best_location() + [2.0*math.pi])
+        pdb_mob.write_pdb(reference_file.replace(".pdb", "-F" + str(i+1) + ".pdb"))
+
+        print("###")
+        angles = pdb_mob.get_angles()
+        for a in xrange(0, pdb_mob.get_number_amino_acids()*2, 2):
+            print(round(math.degrees(angles[a]),2), round(math.degrees(angles[a+1]),2))
+
+        fig, ax1 = plt.subplots()
+        ax1.plot(scores_over_time, 'b-')
+        ax1.set_title('Energy over iterations: ' + reference_file.replace(".pdb", "-F"))
+        ax1.set_xlabel('Iterations')
+        # Make the y-axis label, ticks and tick labels match the line color.
+        ax1.set_ylabel('Energy', color='b')
+        ax1.tick_params('y', colors='b')
+        ax2 = ax1.twinx()
+        ax2.plot(rmsds_over_time, 'r-')
+        ax2.set_ylabel('RMSD', color='r')
+        ax2.tick_params('y', colors='r')
+        fig = plt.gcf()
+        print("###############################")
+        fig.savefig(reference_file.replace(".pdb", "-F" + str(i+1) + "_energy.png"), dpi=100, bbox_inches='tight') 
+
 print("Finished run")
-   
-pdb_mob.rotate_to([2.0*math.pi] + pso.get_best_location() + [2.0*math.pi])
-pdb_mob.write_pdb(reference_file.replace(".pdb", "-F.pdb"))
-
-print("###")
-angles = pdb_mob.get_angles()
-for a in xrange(0, pdb_mob.get_number_amino_acids()*2, 2):
-    print(round(math.degrees(angles[a]),2), round(math.degrees(angles[a+1]),2))
-
-
-fig, ax1 = plt.subplots()
-ax1.plot(scores_over_time, 'b-')
-ax1.set_title('Energy over iterations: ' + reference_file.replace(".pdb", "-F"))
-ax1.set_xlabel('Iterations')
-# Make the y-axis label, ticks and tick labels match the line color.
-ax1.set_ylabel('Energy', color='b')
-ax1.tick_params('y', colors='b')
-ax2 = ax1.twinx()
-ax2.plot(rmsds_over_time, 'r-')
-ax2.set_ylabel('RMSD', color='r')
-ax2.tick_params('y', colors='r')
-fig = plt.gcf()
-fig.savefig(reference_file.replace(".pdb", "-F_energy.png"), dpi=100, bbox_inches='tight') 

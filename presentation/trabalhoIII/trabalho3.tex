@@ -151,9 +151,9 @@ Tempo de execução: $19$ minutos
 \begin{frame}
 \frametitle{Resultados}
 \begin{itemize}
-  \item $RMSD_{C_\alpha}: 0.40$
-  \item $RMSD_{backbone}: 0.83$
-  \item $RMSD_{all}: 2.38$ 
+  \item $RMSD_{C_\alpha}: 0.40 \angstrom$
+  \item $RMSD_{backbone}: 0.83 \angstrom$
+  \item $RMSD_{all}: 2.38 \angstrom$ 
 \end{itemize}
 \begin{figure}
 \includegraphics[width=0.5\linewidth]{1PLX-F.png}
@@ -195,9 +195,9 @@ MET         & -74.24 x  -9.66 &  360.00 x  360.00 & -179.95 x  180.00
 \item Sequência: NLYIQWLKDGGPSSGRPPPS;
 \item 1L2Y x 1L2Y-P:
 \begin{itemize}
-  \item $RMSD_{C_\alpha}: 17.89$
-  \item $RMSD_{backbone}: 18.08$
-  \item $RMSD_{all}: 19.13$ 
+  \item $RMSD_{C_\alpha}: 17.89 \angstrom$
+  \item $RMSD_{backbone}: 18.08 \angstrom$
+  \item $RMSD_{all}: 19.13 \angstrom$ 
 \end{itemize}
 \end{itemize}
 \begin{figure}
@@ -223,7 +223,7 @@ $\sum_{dihedrals} K_{\chi}(1 + cos(\eta - \delta)) + $
 
 $\sum_{impropers} K_{imp}(\varphi - \varphi_0)^2 + $
 
-$\color{red}\sum_{nonbond} \varepsilon [(\frac{R_{minij}}{r_{ij}})^{12} -2(\frac{R_{minij}}{r_{ij}})^6] + \frac{q_i q_j}{\varepsilon_1 r_{ij}} $
+$\color{red}\sum_{nonbond} \varepsilon_{ij} [(\frac{R_{minij}}{r_{ij}})^{12} -2(\frac{R_{minij}}{r_{ij}})^6] + \varepsilon_1 \frac{q_i q_j}{r_{ij}} $
 \end{frame}
 
 \begin{frame}
@@ -238,7 +238,7 @@ $R_{minij} = \frac{R_{mini} + R_{minj}}{2}$
 
 $U^{LJ}_{ij} = \sqrt{ \color{red} \varepsilon_i \varepsilon_j \color{black} } [(\frac{R_{mini} + R_{minj}}{2r_{ij}})^{12} -2(\frac{R_{mini} + R_{minj}}{2r_{ij}})^{6}]$
 
-$\varepsilon_1 = 9 \cdot 10^9 \color{blue} \cdot \frac{(1.6022 \cdot 10^{-19})^2}{1 \cdot 10^{-9}} \cdot \frac{6.022140857 \cdot 10^{23}}{1000} \color{black}$
+$\varepsilon_1 = 9 \cdot 10^9 \color{blue} \cdot \frac{(1.6022 \cdot 10^{-19})^2}{1 \cdot 10^{-9}} \cdot \frac{6.022140857 \cdot 10^{23}}{1000} (kJ/mol) \color{black}$
 
 $E_{nonbond} = \sum_{nonbond} \varepsilon_{ij} [(\frac{R_{minij}}{r_{ij}})^{12} -2(\frac{R_{minij}}{r_{ij}})^6] + \varepsilon_1 \frac{\color{red}q_i q_j \color{black}}{r_{ij}}$
 \end{frame}
@@ -251,8 +251,8 @@ Particle Swarm Optimization
   \item Função de avaliação: $E_{nonbond}$ (AMBER99);
   \item Dimensões: $2 \times \parallel AA \parallel - 2$;
   \item Limites: $[-\pi, \pi]$;
-  \item População: $20$;
-  \item Iterações: $300$
+  \item População: $60$;
+  \item Iterações: $200$
 \end{itemize}
 \end{frame}
 
@@ -265,18 +265,23 @@ Particle Swarm Optimization
 \begin{figure}
 \includegraphics[width=0.7\linewidth]{1L2Y-F_energy.png}
 \end{figure}
-Tempo: 1h 54min
+%Tempo: 1h 54min
+Tempo:
 \end{frame}
 
 \begin{frame}
 \frametitle{1L2Y X 1L2Y-F}
+\begin{itemize}
+  \item $E_{nonbond}^{1L2Y}: kJ/mol$
+  \item $E_{nonbond}^{1L2Y-F}: kJ/mol$
+\end{itemize} 
 \begin{figure}
 \includegraphics[width=0.4\linewidth]{1L2Y-F.png}
 \end{figure}
 \begin{itemize}
-  \item $RMSD_{C_\alpha}: 6.17$
-  \item $RMSD_{backbone}: 5.80$
-  \item $RMSD_{all}: 7.45$ 
+  \item $RMSD_{C_\alpha}: \angstrom$
+  \item $RMSD_{backbone}: \angstrom$
+  \item $RMSD_{all}: \angstrom$ 
 \end{itemize}
 \end{frame}
 
