@@ -228,19 +228,19 @@ $\color{red}\sum_{nonbond} \varepsilon [(\frac{R_{minij}}{r_{ij}})^{12} -2(\frac
 
 \begin{frame}
 \frametitle{Termos não ligados}
-$\varepsilon = \sqrt{ \color{red} \varepsilon_i \varepsilon_j \color{black} }$
+$\varepsilon_{ij} = \sqrt{ \color{red} \varepsilon_i \varepsilon_j \color{black} }$
 
-$\color{red}\sigma_i \color{black} = R_{mini} \cdot 2^{-1/6}$
+$R_{mini} = \color{red}\sigma_i \color{black} \cdot 2^{1/6}$
 
-$r_{ij} = \parallel P_i - P_j \parallel$
+$r_{ij} = \parallel P_i - P_j \parallel \color{blue}/10 (nm) \color{black}$ 
 
 $R_{minij} = \frac{R_{mini} + R_{minj}}{2}$
 
 $U^{LJ}_{ij} = \sqrt{ \color{red} \varepsilon_i \varepsilon_j \color{black} } [(\frac{R_{mini} + R_{minj}}{2r_{ij}})^{12} -2(\frac{R_{mini} + R_{minj}}{2r_{ij}})^{6}]$
 
-$\varepsilon_1 = 8.99 \cdot 10^9$
+$\varepsilon_1 = 9 \cdot 10^9 \color{blue} \cdot \frac{(1.6022 \cdot 10^{-19})^2}{1 \cdot 10^{-9}} \cdot \frac{6.022140857 \cdot 10^{23}}{1000} \color{black}$
 
-$E_{nonbond} = \sum_{nonbond} \varepsilon [(\frac{R_{minij}}{r_{ij}})^{12} -2(\frac{R_{minij}}{r_{ij}})^6] + \frac{\color{red}q_i q_j \color{black}}{\varepsilon_1 r_{ij}}$
+$E_{nonbond} = \sum_{nonbond} \varepsilon_{ij} [(\frac{R_{minij}}{r_{ij}})^{12} -2(\frac{R_{minij}}{r_{ij}})^6] + \varepsilon_1 \frac{\color{red}q_i q_j \color{black}}{r_{ij}}$
 \end{frame}
 
 \begin{frame}

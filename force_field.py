@@ -47,6 +47,7 @@ class Force_field():
         self.build_LJ_parameters()
         #pp = pprint.PrettyPrinter(indent=4)
         #pp.pprint(self.LJPARAMETERS)
+        #pp.pprint(self.AMINOACIDS)
         
     def insert_PDB(self, pdb):
         self.PDB = pdb        
@@ -174,8 +175,11 @@ class Force_field():
 
     def non_bonded(self):
         lj = 0.0
-        coulomb = 0.0
-        e1 = 8.99 * math.pow(10.0, 9.0)
+        coulomb = 0.0           
+        eCharge = 1.6022e-19
+        eConstant = 9e9
+        avg = 6.022140857e23
+        e1 = eConstant * ((eCharge * eCharge) / 1e-9) * avg / 1000.0
         atoms = self.PDB.get_atoms()
         atoms_pos = self.PDB.get_all_pos()
         amino_acids = self.PDB.get_amino_acids()
@@ -217,10 +221,10 @@ class Force_field():
                                     qj = a[2] 
                             if(atomj_key == ''):
                                 print(atoms[j], atomj, aaj)                                                                         
-                            rij  = math.sqrt((atoms_pos[i][0] - atoms_pos[j][0])**2 + (atoms_pos[i][1] - atoms_pos[j][1])**2 + (atoms_pos[i][2] - atoms_pos[j][2])**2)                       
+                            rij  = math.sqrt((atoms_pos[i][0] - atoms_pos[j][0])**2 + (atoms_pos[i][1] - atoms_pos[j][1])**2 + (atoms_pos[i][2] - atoms_pos[j][2])**2) / 10.0                      
                             eps  = self.LJPARAMETERS[atomi_key][atomj_key]['epsilon']  
                             rmin = self.LJPARAMETERS[atomi_key][atomj_key]['rmin']  
-                            lj      += eps * (math.pow(rmin/rij, 12.0) - 2.0 * math.pow(rmin/rij, 6.0)) 
-                            coulomb += (qi * qj) / (e1 * rij)
+                            lj      += eps * (math.pow(rmin/rij, 12.0) - 2.0 * math.pow(rmin/rij, 6.0))
+                            coulomb += e1 * ((qi * qj) / rij)
         return lj + coulomb            
-                       
+                      

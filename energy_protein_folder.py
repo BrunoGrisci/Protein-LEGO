@@ -48,10 +48,14 @@ pdb_ref.remove_nones()
    
 pdb_mob.rotate_omegas()
 pdb_mob.set_peptide_bond_angles()
+
+ff.insert_PDB(pdb_ref)
+e_ref = ff.non_bonded()
+print('Reference energy: ' + str(e_ref))
     
 pop_size = 20
 dim = 2 * pdb_ref.get_number_amino_acids() - 2
-min_iterations = 300
+min_iterations = 20
 
 start_time = time.time()
 
@@ -67,7 +71,7 @@ for i in xrange(min_iterations):
     pdb_mob.rotate_to([2.0*math.pi] + pso.get_best_location() + [2.0*math.pi])
     best_rmsd = calc_exact_rmsd(pdb_ref.get_all_pos(), pdb_mob.get_all_pos())
     rmsds_over_time.append(best_rmsd)
-    print(pso.get_best_score(), best_rmsd)
+    print(pso.get_best_score(), best_rmsd, pso.get_best_score() - e_ref)
 elapsed_time = time.time() - start_time
 print("Elapsed time: " + str(elapsed_time))
 print([2.0*math.pi] + pso.get_best_location() + [2.0*math.pi])
