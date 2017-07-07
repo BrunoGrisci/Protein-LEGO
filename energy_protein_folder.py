@@ -30,6 +30,24 @@ def evaluator(solutions, force_field, pdb_ref, pdb_mob):
         scores.append(score)
     return scores
 
+def save_log(i, dimensions, solutions, scrs):
+    header = 'id'
+    for d in xrange(dimensions):
+        header = header + ',d' + str(d)
+    header = header + ',score\n'
+    log = open('log/' + str(i) + '.csv', 'w')
+    log.write(header)
+    pid = 1
+    for p in zip(solutions, scrs):
+        data = p[0] + [p[1]]
+        line = str(pid)
+        for d in data:
+            line = line + ',' + str(d)
+        line = line + '\n'
+        log.write(line)
+        pid += 1
+    log.close()    
+
 reference_file = sys.argv[1]
 mobile_file = sys.argv[2]
 bonded_file = sys.argv[3]
@@ -53,9 +71,9 @@ ff.insert_PDB(pdb_ref)
 e_ref = ff.non_bonded()
 print('Reference energy: ' + str(e_ref))
     
-pop_size = 60
+pop_size = 10
 dim = 2 * pdb_ref.get_number_amino_acids() - 2
-min_iterations = 1000
+min_iterations = 1000   
 
 start_time = time.time()
 
@@ -66,6 +84,11 @@ rmsds_over_time = []
 for i in xrange(min_iterations):
     locations = pso.get_locations()
     scores = evaluator(locations, ff, pdb_ref, pdb_mob)
+    
+    if i%1 == 0:
+        dlocations = [[math.degrees(x) for x in group] for group in locations]
+        save_log(i, dim, dlocations, scores)
+    
     pso.run_step(scores) 
     scores_over_time.append(pso.get_best_score())
     pdb_mob.rotate_to([2.0*math.pi] + pso.get_best_location() + [2.0*math.pi])
@@ -73,7 +96,7 @@ for i in xrange(min_iterations):
     rmsds_over_time.append(best_rmsd)
     print(i+1, pso.get_best_score(), best_rmsd, pso.get_best_score() - e_ref)
     
-    if (i+1)%20 == 0:
+    if (i+1)%300 == 0:
         print("###############" + str(i+1) + "##############")   
         elapsed_time = time.time() - start_time
         print("Elapsed time: " + str(elapsed_time))
