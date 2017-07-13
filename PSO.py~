@@ -9,7 +9,7 @@ import copy
 
 class PSO:
     
-    def __init__(self, swarm_size, dimensions, n_in=6, lower_bounds=None, upper_bounds=None, loops=False, movement_step=1.0, momentum_coef=0.729, personal_coef=2.05, informant_coef=2.05, global_coef=0.0, minimization=False):
+    def __init__(self, swarm_size, dimensions, n_in=6, lower_bounds=None, upper_bounds=None, loops=False, movement_step=1.0, momentum_coef=0.729, personal_coef=2.05*0.729, informant_coef=2.05*0.729, global_coef=0.0, minimization=False):
     
         self.swarm_size = swarm_size # Number of particles to be used.
         self.dimensions = dimensions # Number of dimensions of each particle.
