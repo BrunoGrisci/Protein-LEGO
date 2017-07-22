@@ -90,9 +90,9 @@ for i in xrange(min_iterations):
     locations = pso.get_locations()
     scores = evaluator(locations, ff, pdb_ref, pdb_mob)
     
-    if i%1 == 0:
-        dlocations = [[math.degrees(x) for x in group] for group in locations]
-        save_log(i, dim, dlocations, scores, pso.get_best_location(), pso.get_best_score())
+    #if i%1 == 0:
+    #    dlocations = [[math.degrees(x) for x in group] for group in locations]
+    #    save_log(i, dim, dlocations, scores, pso.get_best_location(), pso.get_best_score())
     
     pso.run_step(scores) 
     scores_over_time.append(pso.get_best_score())

@@ -9,7 +9,7 @@ import copy
 
 class PSO:
     
-    def __init__(self, swarm_size, dimensions, n_in=6, lower_bounds=None, upper_bounds=None, loops=False, movement_step=1.0, momentum_coef=0.729, personal_coef=2.05*0.729, informant_coef=2.05*0.729, global_coef=0.0, minimization=False):
+    def __init__(self, swarm_size, dimensions, n_in=6, lower_bounds=None, upper_bounds=None, loops=False, movement_step=1.0, momentum_coef=0.729, personal_coef=2.05*0.729, informant_coef=2.05*0.729, global_coef=0.0, rps=True, rot_angle=0.62831853071, axes_rot_percent=0.4, minimization=False):
     
         self.swarm_size = swarm_size # Number of particles to be used.
         self.dimensions = dimensions # Number of dimensions of each particle.
@@ -56,6 +56,11 @@ class PSO:
         self.personal_coef = personal_coef # How much of the personal best is mixed in. If personal_coef is large, particles tend to move more towards their own personal bests rather than towards global bests. This breaks the swarm into a lot of separate hill-climbers rather than a joint searcher.
         self.informant_coef = informant_coef # How much of the informants best is mixed in. The effect here may be a mid-ground between personal_coef and global_coef. The number of informants is also a factor (assuming theyre picked at random): more informants is more like the global best and less like the particles local best.
         self.global_coef = global_coef # How much of the global best is mixed in. If global_coef is large, particles tend to move more towards the best known region. This converts the algorithm into one large hill-climber rather than separate hill-climbers. Perhaps because this threatens to make the system highly exploitative, global_coef is often set to 0 in modern implementations.
+        
+        self.rps = rps # If True uses the Rotated Particle Swarm (RPS) algorithm
+        self.rot_angle = rot_angle # Angle of rotation
+        self.axes_rot_percent = axes_rot_percent # Number of axes to be rotated by the percentage of the number of dimensions
+        
         self.minimization = minimization # If True minimizes, if False maximizes
         
         self.swarm_location = [] # List of lists: swarm_size x dimensions -> location of each particle
@@ -107,6 +112,24 @@ class PSO:
                 new_velocity.append(v)
             self.swarm_location.append(new_location)
             self.swarm_velocity.append(new_velocity)
+
+    def get_rotation_matrix(self, dim, theta, n_axes):
+        cos_theta = np.cos(theta)
+        sin_theta = np.sin(theta)
+        matrix = np.eye(dim)      
+        axes = random.sample(range(dim), int(n_axes) * 2)
+        for i in xrange(int(n_axes)):
+            a = axes[2*i]
+            b = axes[2*i+1]
+            if a > b:
+                c = b
+                b = a
+                a = c
+            matrix[a,a] = cos_theta
+            matrix[b,b] = cos_theta
+            matrix[b,a] = sin_theta
+            matrix[a,b] = -sin_theta
+        return matrix
         
     def update_velocity(self):
         for p in xrange(self.swarm_size):
@@ -120,11 +143,18 @@ class PSO:
             ic = self.informant_coef * np.random.random_sample((self.dimensions,))
             gc = self.global_coef * np.random.random_sample((self.dimensions,))
             
-            new_vel = self.momentum_coef * current_velocity 
-            new_vel = new_vel + (pc * (best_personal_location - current_location))
-            new_vel = new_vel + (ic * (best_informant_location - current_location))
-            new_vel = new_vel + (gc * (best_global_location - current_location))
-            
+            new_vel = self.momentum_coef * current_velocity
+            if self.rps: 
+                rot_matrix = self.get_rotation_matrix(self.dimensions, self.rot_angle, self.axes_rot_percent * self.dimensions)
+                t_rot_matrix = rot_matrix.transpose()   
+                new_vel = new_vel + np.dot((pc * np.dot((best_personal_location - current_location), t_rot_matrix)), rot_matrix)
+                new_vel = new_vel + np.dot((ic * np.dot((best_informant_location - current_location), t_rot_matrix)), rot_matrix)
+                if gc.all() != 0.0:
+                    new_vel = new_vel + np.dot((gc * np.dot((best_global_location - current_location), t_rot_matrix)), rot_matrix)               
+            else:
+                new_vel = new_vel + pc * (best_personal_location - current_location)
+                new_vel = new_vel + ic * (best_informant_location - current_location)
+                new_vel = new_vel + gc * (best_global_location - current_location)    
             #This segment of the code changes the velocity if the result does not respect the boundaries
             new_velocity = copy.deepcopy(list(new_vel))        
             for d in xrange(self.dimensions):
