@@ -30,7 +30,7 @@ def evaluator(solutions, force_field, pdb_ref, pdb_mob):
         scores.append(score)
     return scores
 
-def save_log(i, dimensions, solutions, scrs, bsol, bcrs):
+def save_log(i, dimensions, solutions, scrs, bsol, bscr):
     header = 'id'
     for d in xrange(dimensions):
         header = header + ',d' + str(d)
@@ -47,9 +47,9 @@ def save_log(i, dimensions, solutions, scrs, bsol, bcrs):
         log.write(line)
         pid += 1
     line = 'best'
-    data = bsol + [bcrs]
-    for d in data:
-        line = line + ',' + str(d)
+    for d in bsol:
+        line = line + ',' + str(math.degrees(d))
+    line = line + ',' + str(bscr)    
     log.write(line)            
     log.close()    
 
@@ -90,9 +90,9 @@ for i in xrange(min_iterations):
     locations = pso.get_locations()
     scores = evaluator(locations, ff, pdb_ref, pdb_mob)
     
-    #if i%1 == 0:
-    #    dlocations = [[math.degrees(x) for x in group] for group in locations]
-    #    save_log(i, dim, dlocations, scores, pso.get_best_location(), pso.get_best_score())
+    if i > 0 and i%1 == 0:
+        dlocations = [[math.degrees(x) for x in group] for group in locations]
+        save_log(i, dim, dlocations, scores, pso.get_best_location(), pso.get_best_score())
     
     pso.run_step(scores) 
     scores_over_time.append(pso.get_best_score())

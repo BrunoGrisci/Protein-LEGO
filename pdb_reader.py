@@ -124,6 +124,21 @@ class PDB_reader:
         movement = np.matrix([target] * len(self.atoms_pos))
         pos = np.matrix(self.atoms_pos)
         self.atoms_pos = np.matrix.tolist(pos + movement)
+
+    def translate(self, x, y, z):
+        pos = np.matrix(self.atoms_pos)
+        movement = np.matrix([[x,y,z]] * len(self.atoms_pos))
+        self.atoms_pos = np.matrix.tolist(pos + movement)
+    
+    def rotate(self, x, y, z):
+        rot = [x, y, z]    
+        rotX = np.matrix([[1.0, 0.0, 0.0], [0.0, math.cos(rot[0]), -math.sin(rot[0])], [0.0, math.sin(rot[0]), math.cos(rot[0])]])
+        rotY = np.matrix([[math.cos(rot[1]), 0.0, math.sin(rot[1])], [0.0, 1.0, 0.0], [-math.sin(rot[1]), 0.0, math.cos(rot[1])]])
+        rotZ = np.matrix([[math.cos(rot[2]), -math.sin(rot[2]), 0.0], [math.sin(rot[2]), math.cos(rot[2]), 0.0], [0.0, 0.0, 1.0]])
+        rotXYZ = rotZ * rotY * rotX            
+        transformed_atoms = np.matrix(copy.deepcopy(mob_atoms))
+        pos = np.matrix(self.atoms_pos) 
+        self.atoms_pos = np.matrix.tolist(pos * rotXYZ.transpose())       
         
     def match_atoms(self, ref_atoms, ref_amino_acids):
         aux_atoms = []
