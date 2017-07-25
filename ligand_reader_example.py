@@ -3,6 +3,8 @@
 
 import sys
 import math
+import random
+
 from ligand_reader import LIGAND_reader
 
 pdb_file = sys.argv[1]
@@ -11,21 +13,25 @@ pdb = LIGAND_reader(pdb_file)
 print(pdb.get_sequence())
 print(pdb.get_atoms())
 print(pdb.get_amino_acids())
+print(pdb.get_all_pos())
 
 naa = pdb.get_number_amino_acids()
 print(naa)
 
-ca = pdb.get_ca_info()
-print(ca)
+'''pdb.translate([4, 4, 4])
+pdb.rotate([math.pi/2.0, math.pi/2.0, math.pi/2.0])
+pdb.rotate_to([math.pi/2.0]*10)'''
 
-n = pdb.get_N_info()
-print(n)
+pdb.translate([ random.uniform(-50, 50) for i in range(3) ])
+pdb.rotate([ random.uniform(-math.pi, math.pi) for i in range(3) ])   
+pdb.rotate_to([ random.uniform(-math.pi, math.pi) for i in range(10) ])
 
-c = pdb.get_C_info()
-print(c)
+print(pdb.get_all_pos())
 
-print(len(ca), len(n), len(c))
+pdb.write_pdb(pdb_file.replace(".pdb", "-TEST.pdb"))
 
-#angles = pdb.get_angles()
-#for a in xrange(0, naa*2, 2):
-#    print(round(math.degrees(angles[a]),2), round(math.degrees(angles[a+1]),2))
+
+
+
+
+
