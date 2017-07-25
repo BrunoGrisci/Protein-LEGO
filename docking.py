@@ -8,7 +8,6 @@ import numpy as np
 import copy
 import time
 import matplotlib.pyplot as plt
-import rmsd
 
 from pdb_reader import PDB_reader
 from ligand_reader import LIGAND_reader
@@ -41,20 +40,24 @@ def save_log(i, dimensions, solutions, scrs, bsol, bscr):
     log.write(line)            
     log.close() 
 
-def calc_exact_rmsd(ref_atoms, mob_atoms):
-    ra = np.array(copy.deepcopy(ref_atoms))
-    ma = np.array(copy.deepcopy(mob_atoms))
-    ra -= rmsd.centroid(ra)
-    ma -= rmsd.centroid(ma)
-    return rmsd.kabsch_rmsd(ra, ma)
+def calc_rmsd(ref_atoms, mob_atoms):
+    #not aligned
+    distance_sum = 0.0
+    for coord in zip(ref_atoms, mob_atoms):
+        distance_sum += (coord[0][0] - coord[1][0])**2
+        distance_sum += (coord[0][1] - coord[1][1])**2 
+        distance_sum += (coord[0][2] - coord[1][2])**2  
+    score = math.sqrt(distance_sum / float(len(ref_atoms)))
+    return score
 
 def evaluator(solutions, pdb_pro, pdb_lig, pdb_ref):
     scores = []
     for solution in solutions:
-        pdb_lig.translate(solution[0:3])
-        pdb_lig.rotate(solution[3:6])
-        pdb_lig.rotate_to(solution[6:])
-        score = calc_exact_rmsd(pdb_ref.get_all_pos(), pdb_lig.get_all_pos())
+        pdb_lig1 = copy.deepcopy(pdb_lig)
+        pdb_lig1.translate(solution[0:3])
+        pdb_lig1.rotate(solution[3:6])
+        pdb_lig1.rotate_to(solution[6:])
+        score = calc_rmsd(pdb_ref.get_all_pos(), pdb_lig1.get_all_pos())
         scores.append(score)
     return scores
 
@@ -88,19 +91,20 @@ for i in xrange(min_iterations):
     locations = pso.get_locations()
     scores = evaluator(locations, pdb_pro, pdb_lig, pdb_ref)
     
-    if i > 0 and i%1 == 0:
-        save_log(i, dim, locations, scores, pso.get_best_location(), pso.get_best_score())
+    #if i > 0 and i%1 == 0:
+    #    save_log(i, dim, locations, scores, pso.get_best_location(), pso.get_best_score())
     
     pso.run_step(scores) 
     scores_over_time.append(pso.get_best_score())
-    pdb_lig.translate(pso.get_best_location()[0:3])
-    pdb_lig.rotate(pso.get_best_location()[3:6])
-    pdb_lig.rotate_to(pso.get_best_location()[6:])
-    best_rmsd = calc_exact_rmsd(pdb_ref.get_all_pos(), pdb_lig.get_all_pos())
+    pdb_lig1 = copy.deepcopy(pdb_lig)
+    pdb_lig1.translate(pso.get_best_location()[0:3])
+    pdb_lig1.rotate(pso.get_best_location()[3:6])
+    pdb_lig1.rotate_to(pso.get_best_location()[6:])
+    best_rmsd = calc_rmsd(pdb_ref.get_all_pos(), pdb_lig1.get_all_pos())
     rmsds_over_time.append(best_rmsd)
     print(i+1, pso.get_best_score(), best_rmsd, pso.get_best_score() - e_ref)
     
-    if (i+1)%20 == 0:
+    '''if (i+1)%20 == 0:
         print("###############" + str(i+1) + "##############")   
         elapsed_time = time.time() - start_time
         print("Elapsed time: " + str(elapsed_time))
@@ -110,11 +114,12 @@ for i in xrange(min_iterations):
             location_in_degrees.append(math.degrees(loc))
         print(pso.get_best_location()[0:3] + location_in_degrees)
         print(pso.get_best_score())
-           
-        pdb_lig.translate(pso.get_best_location()[0:3])
-        pdb_lig.rotate(pso.get_best_location()[3:6])
-        pdb_lig.rotate_to(pso.get_best_location()[6:])
-        pdb_lig.write_pdb(ligand_file.replace(".pdb", "-F" + str(i+1) + ".pdb"))
+        
+        pdb_lig1 = copy.deepcopy(pdb_lig)
+        pdb_lig1.translate(pso.get_best_location()[0:3])
+        pdb_lig1.rotate(pso.get_best_location()[3:6])
+        pdb_lig1.rotate_to(pso.get_best_location()[6:])
+        pdb_lig1.write_pdb(ligand_file.replace(".pdb", "-F" + str(i+1) + ".pdb"))
 
         fig, ax1 = plt.subplots()
         ax1.plot(scores_over_time, 'b-')
@@ -129,6 +134,6 @@ for i in xrange(min_iterations):
         ax2.tick_params('y', colors='r')
         fig = plt.gcf()
         print("###############################")
-        fig.savefig(ligand_file.replace(".pdb", "-F" + str(i+1) + "_energy.png"), dpi=100, bbox_inches='tight')
+        fig.savefig(ligand_file.replace(".pdb", "-F" + str(i+1) + "_energy.png"), dpi=100, bbox_inches='tight')'''
 
 print("Finished run")
