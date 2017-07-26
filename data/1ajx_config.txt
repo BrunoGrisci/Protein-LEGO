@@ -1,0 +1,10 @@
+receptor = data/1ajx_protein.pdbqt
+ligand = data/1ajx_ligand.pdbqt
+center_x = 11.741
+center_y = 23.343
+center_z = 5.989
+size_x = 11.0
+size_y = 11.0
+size_z = 11.0
+out = 1ajx_ligand.pdbqt
+

@@ -12,6 +12,23 @@ class LIGAND_reader(PDB_reader):
     ATOM_TAG = "HETATM"
     END_TAG = "END"
     
+    def write_pdbqt(self, file_name):
+        j = 0
+        f = open(file_name, "r+")        
+        lines = f.readlines()
+        f.seek(0)
+        f.truncate()
+        for line in lines:
+            if self.ATOM_TAG in line:
+                i = line[12:16].replace(" ", "")
+                i = int(i[1:]) - 1
+                at = line[77:80].replace(" ", "").replace('\n', '')
+                line = "{:6s}{:5d} {:^4s}{:1s}{:3s} {:1s}{:4d}{:1s}   {:8.3f}{:8.3f}{:8.3f}{:6.2f}{:6.2f}          {:>2s}{:2s}".format(self.ATOM_TAG, j+1, self.atoms_full[i], " ", self.amino_acids[i], " ", self.amino_acids_number[i], " ", self.atoms_pos[i][0], self.atoms_pos[i][1], self.atoms_pos[i][2], self.more_stuff[i][0], self.more_stuff[i][1], " ", at)
+                line = line + "\n"
+                j += 1
+            f.write(line)                 
+        f.close()   
+    
     def rotate_to(self, angles): 
         rotable_bounds = [( 7,  1,  8,  9), 
                           ( 2,  3, 16, 17),
