@@ -1,0 +1,5 @@
+\beamer@endinputifotherversion {3.24pt}
+\select@language {brazilian}
+\beamer@sectionintoc {1}{Introdu\IeC {\c c}\IeC {\~a}o}{3}{0}{1}
+\beamer@sectionintoc {2}{Implementa\IeC {\c c}\IeC {\~a}o}{5}{0}{2}
+\beamer@sectionintoc {3}{Resultados}{9}{0}{3}

@@ -1,0 +1,226 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Beamer Presentation
+% LaTeX Template
+% Version 1.0 (10/11/12)
+%
+% This template has been downloaded from:
+% http://www.LaTeXTemplates.com
+%
+% License:
+% CC BY-NC-SA 3.0 (http://creativecommons.org/licenses/by-nc-sa/3.0/)
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%----------------------------------------------------------------------------------------
+%	PACKAGES AND THEMES
+%----------------------------------------------------------------------------------------
+
+\documentclass{beamer}
+
+\mode<presentation> {
+
+% The Beamer class comes with a number of default slide themes
+% which change the colors and layouts of slides. Below this is a list
+% of all the themes, uncomment each in turn to see what they look like.
+
+%\usetheme{default}
+%\usetheme{AnnArbor}
+%\usetheme{Antibes}
+%\usetheme{Bergen}
+%\usetheme{Berkeley}
+%\usetheme{Berlin}
+%\usetheme{Boadilla}
+%\usetheme{CambridgeUS}
+%\usetheme{Copenhagen}
+%\usetheme{Darmstadt}
+%\usetheme{Dresden}
+\usetheme{Frankfurt}
+%\usetheme{Goettingen}
+%\usetheme{Hannover}
+%\usetheme{Ilmenau}
+%\usetheme{JuanLesPins}
+%\usetheme{Luebeck}
+%\usetheme{Madrid}
+%\usetheme{Malmoe}
+%\usetheme{Marburg}
+%\usetheme{Montpellier}
+%\usetheme{PaloAlto}
+%\usetheme{Pittsburgh}
+%\usetheme{Rochester}
+%\usetheme{Singapore}
+%\usetheme{Szeged}
+%\usetheme{Warsaw}
+
+% As well as themes, the Beamer class has a number of color themes
+% for any slide theme. Uncomment each of these in turn to see how it
+% changes the colors of your current slide theme.
+
+%\usecolortheme{albatross}
+%\usecolortheme{beaver}
+%\usecolortheme{beetle}
+%\usecolortheme{crane}
+%\usecolortheme{dolphin}
+%\usecolortheme{dove}
+%\usecolortheme{fly}
+%\usecolortheme{lily}
+%\usecolortheme{orchid}
+%\usecolortheme{rose}
+%\usecolortheme{seagull}
+%\usecolortheme{seahorse}
+%\usecolortheme{whale}
+%\usecolortheme{wolverine}
+
+%\setbeamertemplate{footline} % To remove the footer line in all slides uncomment this line
+%\setbeamertemplate{footline}[page number] % To replace the footer line in all slides with a simple slide count uncomment this line
+
+%\setbeamertemplate{navigation symbols}{} % To remove the navigation symbols from the bottom of all slides uncomment this line
+}
+
+\usepackage{graphicx} % Allows including images
+\usepackage{booktabs} % Allows the use of \toprule, \midrule and \bottomrule in tables
+\usepackage[brazilian]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{animate}
+\usepackage{amsmath}
+\DeclareMathOperator{\atantwo}{atan2}
+\newcommand{\angstrom}{\textup{\AA}}
+
+%----------------------------------------------------------------------------------------
+%	TITLE PAGE
+%----------------------------------------------------------------------------------------
+
+\title[T2]{Trabalho IV} % The short title appears at the bottom of every slide, the full title is only on the title page
+
+\author{Bruno Iochins Grisci} % Your name
+\institute[UFRGS] % Your institution as it will appear on the bottom of every slide, may be shorthand to save space
+{
+Universidade Federal do Rio Grande do Sul \\ % Your institution for the title page
+\medskip
+\textit{bigrisci@inf.ufrgs.br} % Your email address
+}
+\date{\today} % Date, can be changed to a custom date
+
+\begin{document}
+
+\begin{frame}
+\titlepage % Print the title page as the first slide
+\end{frame}
+
+\begin{frame}
+\frametitle{Sumário} % Table of contents slide, comment this block out to remove it
+\tableofcontents % Throughout your presentation, if you choose to use \section{} and \subsection{} commands, these will automatically be printed on this slide as an overview of your presentation
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+%	PRESENTATION SLIDES
+%----------------------------------------------------------------------------------------
+
+%------------------------------------------------
+\section{Introdução} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+
+\begin{frame}
+\frametitle{Ferramentas}
+\begin{itemize}
+\item Python;
+\item Numpy;
+\item Orientado a Objetos;
+\item Trabalhos I, II e III;
+\item DockThor;
+\item Vina.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{1AJX}
+\begin{figure}
+\includegraphics[width=0.7\linewidth]{1AJX.png}
+\end{figure}
+\end{frame}
+
+%------------------------------------------------
+\section{Implementação} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Docking}
+\begin{itemize}
+  \item Proteína rígida;
+  \item Ligante: translação, rotação, rotações internas;
+  \item Função de energia: Vina.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Ligações com rotação}
+DockThor
+\begin{figure}
+\includegraphics[width=0.2\linewidth]{dockthor.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Configuração do Vina}
+\begin{figure}
+\includegraphics[width=0.6\linewidth]{config.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Otimização}
+Rotation Particle Swarm Optimization
+\begin{itemize}
+  \item Minimização;
+  \item Função de avaliação: Vina;
+  \item Dimensões: $3 + 3 + 10$;
+  \item Limites: $[-11, 11], [-\pi, \pi]$;
+  \item População: $60$;
+  \item Iterações: $1000$
+\end{itemize}
+\end{frame}
+
+%------------------------------------------------
+\section{Resultados} % Sections can be created in order to organize your presentation into discrete blocks, all sections and subsections are automatically printed in the table of contents as an overview of the talk
+%------------------------------------------------
+
+\begin{frame}
+\frametitle{Energia X RMSD}
+\begin{figure}
+\includegraphics[width=0.7\linewidth]{1ajx_ligand-F60_energy.png}
+\end{figure}
+\end{frame}
+
+\begin{frame}
+\frametitle{Energia X RMSD}
+\begin{figure}
+\includegraphics[width=0.7\linewidth]{1ajx_ligand-F1000_energy.png}
+\end{figure}
+Tempo: 1h 48 min
+\end{frame}
+
+\begin{frame}
+\frametitle{Energias}
+\begin{itemize}
+  \item $E_{Vina}^{1AJX}: -10.22689 kJ/mol$
+  \item $E_{Vina}^{1AJX-F}: -4.30361 kJ/mol$  
+\end{itemize} 
+\end{frame}
+
+\begin{frame}
+\frametitle{1AJX x 1AJX-F}
+\begin{figure}
+\includegraphics[width=0.6\linewidth]{1AJX-F.png}
+\end{figure}
+\begin{itemize}
+  \item $RMSD_{all-ligand}^{not-aligned}: 22.02\angstrom$ 
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\Huge{\centerline{Fim}}
+\end{frame}
+
+%----------------------------------------------------------------------------------------
+
+\end{document} 
